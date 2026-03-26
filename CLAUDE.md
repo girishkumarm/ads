@@ -204,6 +204,52 @@ When the bot starts (or restarts after a crash):
    python3 /root/stocks/notify.py send "Ads bot online. [X] crons scheduled." --title "Ads Bot Online" --priority high
    ```
 
+## Google Ads Accounts
+
+Two separate Google Ads accounts, BOTH managed by this bot:
+
+| Account | Customer ID | Email | Business |
+|---------|------------|-------|----------|
+| Resort | 299-516-0429 | namooruresortsads@gmail.com | Namooru Ecostay |
+| Cafe | 761-446-0903 | btm@brewinguntoldstories.com | BUS Cafe |
+
+Both are under MCC 394-768-4492. The `cafe_customer_id` field in ads-config.json holds the cafe ID.
+
+When querying Google Ads data, run commands for BOTH accounts and combine in reports.
+
+## Google Ads Playwright Fallback (TEMPORARY)
+
+**STATUS:** The Google Ads API developer token is currently "Test Account" access — cannot access production accounts. Basic Access has been applied for (takes 1-3 business days). Until approved, use Playwright browser automation to get Google Ads data.
+
+**How to check if API is working:**
+```bash
+python3 ads_api.py google campaigns
+```
+If this returns data (not 404/error), the API is approved — **stop using Playwright and switch to API**.
+
+**Playwright login credentials:**
+
+| Account | URL | Email | Password |
+|---------|-----|-------|----------|
+| Resort | ads.google.com | namooruresortsads@gmail.com | Yuvan@123. |
+| Cafe | ads.google.com | btm@brewinguntoldstories.com | Yuvan@123. |
+
+**IMPORTANT:** If Google asks for mobile OTP or any 2FA/approval during login:
+1. Send the prompt to Girish via Telegram: `python3 /root/stocks/notify.py send "Google Ads login needs OTP/approval for [account]. Please check your phone." --title "OTP Needed" --priority high`
+2. Wait for Girish to respond via Telegram with the OTP or confirm approval
+3. NEVER enter OTPs yourself — always ask Girish
+
+**What to scrape via Playwright:**
+- Campaign names, status, daily budget
+- Clicks, impressions, CTR, CPC, cost, conversions (from Overview page)
+- Search terms report (from Keywords → Search terms)
+- Account balance (from Billing)
+- Any warnings/recommendations
+
+**Xvfb display:** `export DISPLAY=:99` (already running on VPS via systemd)
+
+**Once API Basic Access is approved:** Delete this entire "Playwright Fallback" section from CLAUDE.md and switch all Google Ads operations to `ads_api.py` commands. The Playwright workaround is temporary only.
+
 ## Troubleshooting
 
 ### Google Ads API auth fails
