@@ -1,0 +1,18 @@
+# Sensitive config — NEVER commit
+ads-config.json
+.ads-token.json
+
+# Claude local config
+.claude/
+__pycache__/
+
+# Daily reports (generated, not source)
+ads-report-*.md
+ads-weekly-review-*.md
+ads-monthly-*.md
+
+# OAuth helper (one-time use)
+oauth_capture.py
+
+# Runtime state (generated on VPS)
+ads-metrics-history.json
