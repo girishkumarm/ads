@@ -1,0 +1,58 @@
+{
+  "daily": [
+    {
+      "date": "2026-03-26",
+      "facebook": {
+        "total_spend": 1415.68,
+        "total_impressions": 83679,
+        "total_clicks": 3290,
+        "avg_ctr": 3.93,
+        "landing_page_views": 2210,
+        "campaigns": {
+          "jnr_video": {
+            "spend": 339,
+            "clicks": 2106,
+            "ctr": 6.8,
+            "cpc": 0.16,
+            "lpv": 1556
+          },
+          "jnr_hyper": {
+            "spend": 61,
+            "clicks": 58,
+            "ctr": 1.99,
+            "cpc": 1.05,
+            "lpv": 22
+          },
+          "btm_video": {
+            "spend": 396,
+            "clicks": 457,
+            "ctr": 3.3,
+            "cpc": 0.87,
+            "lpv": 347
+          },
+          "btm_hyper": {
+            "spend": 62,
+            "clicks": 75,
+            "ctr": 3.18,
+            "cpc": 0.83,
+            "lpv": 55
+          },
+          "resort": {
+            "spend": 419,
+            "clicks": 480,
+            "ctr": 2.29,
+            "cpc": 0.87,
+            "lpv": 230
+          }
+        },
+        "mtd_spend": 39402.34
+      },
+      "google": {
+        "status": "API_DOWN"
+      },
+      "actions_taken": 12,
+      "ads_paused": 11,
+      "ads_created": 20
+    }
+  ]
+}

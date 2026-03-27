@@ -608,7 +608,7 @@ def fb_insights(config, object_id, days=7, level=None):
     """Get insights for a campaign/adset/ad."""
     params = {
         "fields": "impressions,reach,frequency,clicks,ctr,cpc,cpm,spend,actions,cost_per_action_type",
-        "date_preset": f"last_{days}_days" if days in [3, 7, 14, 28, 30] else "last_7_days",
+        "date_preset": f"last_{days}d" if days in [3, 7, 14, 28, 30] else "last_7d",
     }
     if level:
         params["level"] = level
@@ -619,7 +619,7 @@ def fb_frequency(config, campaign_id):
     """Get frequency and reach data for fatigue detection."""
     return fb_api(config, f"{campaign_id}/insights", {
         "fields": "reach,frequency,impressions,clicks,ctr,cpc,spend",
-        "date_preset": "last_7_days",
+        "date_preset": "last_7d",
     })
 
 
@@ -628,7 +628,7 @@ def fb_demographics(config, campaign_id):
     return fb_api(config, f"{campaign_id}/insights", {
         "fields": "impressions,clicks,spend,ctr,cpc",
         "breakdowns": "age,gender",
-        "date_preset": "last_7_days",
+        "date_preset": "last_7d",
     })
 
 
@@ -637,7 +637,7 @@ def fb_placements(config, campaign_id):
     return fb_api(config, f"{campaign_id}/insights", {
         "fields": "impressions,clicks,spend,ctr,cpc",
         "breakdowns": "publisher_platform,platform_position",
-        "date_preset": "last_7_days",
+        "date_preset": "last_7d",
     })
 
 
@@ -646,7 +646,7 @@ def fb_account_spend(config, days=30):
     fc = config["facebook"]
     return fb_api(config, f"{fc['ad_account_id']}/insights", {
         "fields": "spend,impressions,clicks,ctr,cpc,actions",
-        "date_preset": f"last_{days}_days" if days in [3, 7, 14, 28, 30] else "last_30_days",
+        "date_preset": f"last_{days}d" if days in [3, 7, 14, 28, 30] else "last_30d",
     })
 
 
@@ -776,7 +776,7 @@ def fb_quality_ranking(config, ad_id, days=7):
     """Get ad quality/relevance rankings."""
     return fb_api(config, f"{ad_id}/insights", {
         "fields": "quality_ranking,engagement_rate_ranking,conversion_rate_ranking,impressions,clicks,spend",
-        "date_preset": f"last_{days}_days" if days in [3, 7, 14, 28, 30] else "last_7_days",
+        "date_preset": f"last_{days}d" if days in [3, 7, 14, 28, 30] else "last_7d",
     })
 
 
@@ -784,7 +784,7 @@ def fb_video_metrics(config, ad_id, days=7):
     """Get video watch-through metrics."""
     return fb_api(config, f"{ad_id}/insights", {
         "fields": "video_p25_watched_actions,video_p50_watched_actions,video_p75_watched_actions,video_p100_watched_actions,impressions,spend",
-        "date_preset": f"last_{days}_days" if days in [3, 7, 14, 28, 30] else "last_7_days",
+        "date_preset": f"last_{days}d" if days in [3, 7, 14, 28, 30] else "last_7d",
     })
 
 
@@ -799,7 +799,7 @@ def fb_cost_per_unique(config, campaign_id, days=7):
     """Get cost per unique click and unique reach metrics."""
     return fb_api(config, f"{campaign_id}/insights", {
         "fields": "cost_per_unique_click,unique_clicks,unique_impressions,impressions,clicks,spend",
-        "date_preset": f"last_{days}_days" if days in [3, 7, 14, 28, 30] else "last_7_days",
+        "date_preset": f"last_{days}d" if days in [3, 7, 14, 28, 30] else "last_7d",
     })
 
 

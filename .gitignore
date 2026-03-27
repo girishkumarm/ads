@@ -16,3 +16,6 @@ oauth_capture.py
 
 # Runtime state (generated on VPS)
 ads-metrics-history.json
+.telegram-offset
+telegram-config.json
+media-inbox/
