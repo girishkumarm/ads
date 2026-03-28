@@ -6,6 +6,7 @@ Google Ads + Facebook Marketing API — CLI interface for automated ads optimiza
 Usage:
   python3 ads_api.py auth google                         # Test Google OAuth token
   python3 ads_api.py auth facebook                       # Test FB token validity
+  python3 ads_api.py auth ga4                            # Test GA4 Data API access
 
   # ── Google Ads (Read-Only) ──────────────────────────────────
   python3 ads_api.py google campaigns                    # List all campaigns
@@ -48,6 +49,14 @@ Usage:
   python3 ads_api.py fb video-metrics AD_ID [DAYS]       # Video watch-through rates
   python3 ads_api.py fb ad-review AD_ID                  # Ad review status & feedback
   python3 ads_api.py fb cost-unique CAMPAIGN_ID [DAYS]   # Cost per unique click/impressions
+
+  # ── Cross-Platform ──────────────────────────────────────────
+  # ── GA4 Analytics ───────────────────────────────────────────
+  python3 ads_api.py ga4 traffic [DAYS]                   # Traffic sources report
+  python3 ads_api.py ga4 calls [DAYS]                     # Phone calls by source
+  python3 ads_api.py ga4 pages [DAYS]                     # Top pages
+  python3 ads_api.py ga4 realtime                         # Real-time active users
+  python3 ads_api.py ga4 overview [DAYS]                  # Summary overview
 
   # ── Cross-Platform ──────────────────────────────────────────
   python3 ads_api.py summary                             # Combined overview
@@ -1153,6 +1162,262 @@ def print_ssl_check(config):
 
 
 # ══════════════════════════════════════════════════════════════
+#  GA4 ANALYTICS (Google Analytics 4 Data API)
+# ══════════════════════════════════════════════════════════════
+
+GA4_BASE = "https://analyticsdata.googleapis.com/v1beta"
+
+
+def ga4_property_id(config):
+    """Get GA4 property ID from config with fallback to hardcoded value."""
+    return config.get("google_ads", {}).get("ga4_property_id", "454912366")
+
+
+def ga4_run_report(config, dimensions, metrics, days=7):
+    """Run a GA4 Data API report with given dimensions and metrics."""
+    token = google_get_token(config)
+    if not token:
+        return None
+
+    prop_id = ga4_property_id(config)
+    url = f"{GA4_BASE}/properties/{prop_id}:runReport"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+    body = {
+        "dateRanges": [{"startDate": f"{days}daysAgo", "endDate": "today"}],
+        "dimensions": [{"name": d} for d in dimensions],
+        "metrics": [{"name": m} for m in metrics],
+    }
+    result, status = http_request("POST", url, data=body, headers=headers)
+
+    if status == 401:
+        # Token expired — clear cache and retry once
+        if os.path.exists(TOKEN_CACHE):
+            try:
+                with open(TOKEN_CACHE) as f:
+                    cache = json.load(f)
+                cache.pop("google_access_token", None)
+                cache.pop("google_expires_at", None)
+                with open(TOKEN_CACHE, "w") as f:
+                    json.dump(cache, f)
+            except Exception:
+                pass
+            token = google_get_token(config)
+            if token:
+                headers["Authorization"] = f"Bearer {token}"
+                result, status = http_request("POST", url, data=body, headers=headers)
+
+    if not result or "error" in (result if isinstance(result, dict) else {}):
+        if isinstance(result, dict) and "error" in result:
+            print(f"GA4 API error: {json.dumps(result['error'], indent=2)}", file=sys.stderr)
+        return None
+    return result
+
+
+def ga4_run_report_with_filter(config, dimensions, metrics, dim_filter, days=7):
+    """Run a GA4 report with a dimension filter."""
+    token = google_get_token(config)
+    if not token:
+        return None
+
+    prop_id = ga4_property_id(config)
+    url = f"{GA4_BASE}/properties/{prop_id}:runReport"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+    body = {
+        "dateRanges": [{"startDate": f"{days}daysAgo", "endDate": "today"}],
+        "dimensions": [{"name": d} for d in dimensions],
+        "metrics": [{"name": m} for m in metrics],
+        "dimensionFilter": dim_filter,
+    }
+    result, status = http_request("POST", url, data=body, headers=headers)
+
+    if status == 401:
+        if os.path.exists(TOKEN_CACHE):
+            try:
+                with open(TOKEN_CACHE) as f:
+                    cache = json.load(f)
+                cache.pop("google_access_token", None)
+                cache.pop("google_expires_at", None)
+                with open(TOKEN_CACHE, "w") as f:
+                    json.dump(cache, f)
+            except Exception:
+                pass
+            token = google_get_token(config)
+            if token:
+                headers["Authorization"] = f"Bearer {token}"
+                result, status = http_request("POST", url, data=body, headers=headers)
+
+    if not result or "error" in (result if isinstance(result, dict) else {}):
+        if isinstance(result, dict) and "error" in result:
+            print(f"GA4 API error: {json.dumps(result['error'], indent=2)}", file=sys.stderr)
+        return None
+    return result
+
+
+def ga4_parse_rows(result, dim_names, metric_names):
+    """Parse GA4 API response into list of dicts."""
+    if not result:
+        return []
+    rows = []
+    for row in result.get("rows", []):
+        entry = {}
+        dims = row.get("dimensionValues", [])
+        mets = row.get("metricValues", [])
+        for i, name in enumerate(dim_names):
+            entry[name] = dims[i]["value"] if i < len(dims) else ""
+        for i, name in enumerate(metric_names):
+            entry[name] = mets[i]["value"] if i < len(mets) else "0"
+        rows.append(entry)
+    return rows
+
+
+def ga4_traffic_sources(config, days=7):
+    """Traffic sources report — sessions, users, pageviews by source/medium."""
+    dimensions = ["sessionSource", "sessionMedium"]
+    metrics = ["sessions", "totalUsers", "screenPageViews", "eventCount"]
+    result = ga4_run_report(config, dimensions, metrics, days)
+    rows = ga4_parse_rows(result, dimensions, metrics)
+    if not rows:
+        print("  No traffic data."); return
+
+    print(f"\n  ── Traffic Sources (last {days} days) ──")
+    print(f"  {'Source':<25} {'Medium':<15} {'Sessions':>10} {'Users':>8} {'PageViews':>10} {'Events':>8}")
+    print(f"  {'─'*25} {'─'*15} {'─'*10} {'─'*8} {'─'*10} {'─'*8}")
+    total_sessions, total_users, total_pvs, total_events = 0, 0, 0, 0
+    for r in sorted(rows, key=lambda x: int(x["sessions"]), reverse=True):
+        sessions = int(r["sessions"])
+        users = int(r["totalUsers"])
+        pvs = int(r["screenPageViews"])
+        events = int(r["eventCount"])
+        total_sessions += sessions; total_users += users; total_pvs += pvs; total_events += events
+        print(f"  {r['sessionSource']:<25} {r['sessionMedium']:<15} {sessions:>10} {users:>8} {pvs:>10} {events:>8}")
+    print(f"  {'─'*25} {'─'*15} {'─'*10} {'─'*8} {'─'*10} {'─'*8}")
+    print(f"  {'TOTAL':<25} {'':<15} {total_sessions:>10} {total_users:>8} {total_pvs:>10} {total_events:>8}")
+
+
+def ga4_phone_calls(config, days=7):
+    """Phone calls by source — filtered to event_name = phone_call."""
+    dimensions = ["sessionSource", "sessionMedium"]
+    metrics = ["eventCount"]
+    dim_filter = {
+        "filter": {
+            "fieldName": "eventName",
+            "stringFilter": {
+                "matchType": "EXACT",
+                "value": "phone_call",
+            },
+        }
+    }
+    result = ga4_run_report_with_filter(config, dimensions, metrics, dim_filter, days)
+    rows = ga4_parse_rows(result, dimensions, metrics)
+    if not rows:
+        print("  No phone call data."); return
+
+    print(f"\n  ── Phone Calls by Source (last {days} days) ──")
+    print(f"  {'Source':<25} {'Medium':<15} {'Calls':>8}")
+    print(f"  {'─'*25} {'─'*15} {'─'*8}")
+    total = 0
+    for r in sorted(rows, key=lambda x: int(x["eventCount"]), reverse=True):
+        calls = int(r["eventCount"])
+        total += calls
+        print(f"  {r['sessionSource']:<25} {r['sessionMedium']:<15} {calls:>8}")
+    print(f"  {'─'*25} {'─'*15} {'─'*8}")
+    print(f"  {'TOTAL':<25} {'':<15} {total:>8}")
+
+
+def ga4_pages(config, days=7):
+    """Top pages report — pageviews, sessions, avg duration, bounce rate."""
+    dimensions = ["pagePath"]
+    metrics = ["screenPageViews", "sessions", "averageSessionDuration", "bounceRate"]
+    result = ga4_run_report(config, dimensions, metrics, days)
+    rows = ga4_parse_rows(result, dimensions, metrics)
+    if not rows:
+        print("  No page data."); return
+
+    print(f"\n  ── Top Pages (last {days} days) ──")
+    print(f"  {'Page Path':<50} {'Views':>8} {'Sessions':>10} {'Avg Dur':>10} {'Bounce':>8}")
+    print(f"  {'─'*50} {'─'*8} {'─'*10} {'─'*10} {'─'*8}")
+    for r in sorted(rows, key=lambda x: int(x["screenPageViews"]), reverse=True)[:30]:
+        path = r["pagePath"][:48]
+        views = int(r["screenPageViews"])
+        sessions = int(r["sessions"])
+        avg_dur = float(r["averageSessionDuration"])
+        bounce = float(r["bounceRate"]) * 100
+        mins = int(avg_dur // 60)
+        secs = int(avg_dur % 60)
+        print(f"  {path:<50} {views:>8} {sessions:>10} {mins:>4}m {secs:02d}s {bounce:>7.1f}%")
+
+
+def ga4_realtime(config):
+    """Real-time active users by country."""
+    token = google_get_token(config)
+    if not token:
+        print("  Auth failed."); return
+
+    prop_id = ga4_property_id(config)
+    url = f"{GA4_BASE}/properties/{prop_id}:runRealtimeReport"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+    body = {
+        "dimensions": [{"name": "country"}],
+        "metrics": [{"name": "activeUsers"}],
+    }
+    result, status = http_request("POST", url, data=body, headers=headers)
+
+    if not result or "error" in (result if isinstance(result, dict) else {}):
+        if isinstance(result, dict) and "error" in result:
+            print(f"GA4 API error: {json.dumps(result['error'], indent=2)}", file=sys.stderr)
+        else:
+            print("  No realtime data.")
+        return
+
+    rows = ga4_parse_rows(result, ["country"], ["activeUsers"])
+    total = sum(int(r["activeUsers"]) for r in rows)
+    print(f"\n  ── Real-Time Active Users: {total} ──")
+    if rows:
+        print(f"  {'Country':<30} {'Active Users':>14}")
+        print(f"  {'─'*30} {'─'*14}")
+        for r in sorted(rows, key=lambda x: int(x["activeUsers"]), reverse=True):
+            print(f"  {r['country']:<30} {int(r['activeUsers']):>14}")
+
+
+def ga4_overview(config, days=7):
+    """Summary overview — total sessions, users, pageviews, avg duration, bounce rate."""
+    dimensions = []
+    metrics = ["sessions", "totalUsers", "screenPageViews", "averageSessionDuration", "bounceRate"]
+    result = ga4_run_report(config, dimensions, metrics, days)
+    if not result or not result.get("rows"):
+        print("  No overview data."); return
+
+    row = result["rows"][0]
+    mets = row.get("metricValues", [])
+    sessions = int(mets[0]["value"]) if len(mets) > 0 else 0
+    users = int(mets[1]["value"]) if len(mets) > 1 else 0
+    pvs = int(mets[2]["value"]) if len(mets) > 2 else 0
+    avg_dur = float(mets[3]["value"]) if len(mets) > 3 else 0
+    bounce = float(mets[4]["value"]) * 100 if len(mets) > 4 else 0
+
+    mins = int(avg_dur // 60)
+    secs = int(avg_dur % 60)
+
+    print(f"\n  ── GA4 Overview (last {days} days) ──")
+    print(f"  Sessions:           {sessions:,}")
+    print(f"  Users:              {users:,}")
+    print(f"  Pageviews:          {pvs:,}")
+    print(f"  Avg Session:        {mins}m {secs:02d}s")
+    print(f"  Bounce Rate:        {bounce:.1f}%")
+    if sessions > 0:
+        print(f"  Pages/Session:      {pvs / sessions:.1f}")
+
+
+# ══════════════════════════════════════════════════════════════
 #  CLI DISPATCH
 # ══════════════════════════════════════════════════════════════
 
@@ -1176,7 +1441,7 @@ if __name__ == "__main__":
     # ── Auth Commands ──────────────────────────────────────────
     if cmd == "auth":
         if not args:
-            print("Usage: ads_api.py auth google|facebook"); sys.exit(1)
+            print("Usage: ads_api.py auth google|facebook|ga4"); sys.exit(1)
         platform = args[0].lower()
         if platform == "google":
             token = google_get_token(config)
@@ -1185,6 +1450,25 @@ if __name__ == "__main__":
                 print(f"  Customer ID: {config['google_ads']['customer_id']}")
             else:
                 print("  Google Ads auth FAILED", file=sys.stderr); sys.exit(1)
+        elif platform == "ga4":
+            token = google_get_token(config)
+            if token:
+                prop_id = ga4_property_id(config)
+                print(f"  Google OAuth token OK: {token[:20]}...")
+                print(f"  GA4 Property ID: {prop_id}")
+                # Quick test — run a minimal report
+                url = f"{GA4_BASE}/properties/{prop_id}:runReport"
+                headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+                body = {"dateRanges": [{"startDate": "1daysAgo", "endDate": "today"}], "metrics": [{"name": "activeUsers"}]}
+                result, status = http_request("POST", url, data=body, headers=headers)
+                if status == 200 and result and "rows" in result:
+                    val = result["rows"][0]["metricValues"][0]["value"] if result.get("rows") else "0"
+                    print(f"  GA4 API OK — active users yesterday: {val}")
+                else:
+                    err = result.get("error", {}).get("message", "Unknown error") if isinstance(result, dict) else "No response"
+                    print(f"  GA4 API test FAILED (HTTP {status}): {err}", file=sys.stderr); sys.exit(1)
+            else:
+                print("  Google OAuth auth FAILED", file=sys.stderr); sys.exit(1)
         elif platform in ("facebook", "fb"):
             info = fb_debug_token(config)
             if info and info.get("is_valid"):
@@ -1199,7 +1483,7 @@ if __name__ == "__main__":
             else:
                 print(f"  Facebook token INVALID or expired: {info}", file=sys.stderr); sys.exit(1)
         else:
-            print(f"  Unknown platform: {platform}. Use 'google' or 'facebook'."); sys.exit(1)
+            print(f"  Unknown platform: {platform}. Use 'google', 'facebook', or 'ga4'."); sys.exit(1)
 
     # ── Google Ads Commands ────────────────────────────────────
     elif cmd == "google":
@@ -1800,6 +2084,39 @@ if __name__ == "__main__":
         else:
             print(f"Unknown GoDaddy subcommand: {subcmd}")
             print("Available: domain, dns, dns-add, ssl")
+            sys.exit(1)
+
+    # ── GA4 Analytics Commands ─────────────────────────────────
+    elif cmd == "ga4":
+        if not args:
+            print("Usage: ads_api.py ga4 <subcommand>")
+            print("Available: traffic, calls, pages, realtime, overview")
+            sys.exit(1)
+        subcmd = args[0].lower()
+        subargs = args[1:]
+
+        if subcmd == "traffic":
+            days = int(subargs[0]) if subargs else 7
+            ga4_traffic_sources(config, days)
+
+        elif subcmd == "calls":
+            days = int(subargs[0]) if subargs else 7
+            ga4_phone_calls(config, days)
+
+        elif subcmd == "pages":
+            days = int(subargs[0]) if subargs else 7
+            ga4_pages(config, days)
+
+        elif subcmd == "realtime":
+            ga4_realtime(config)
+
+        elif subcmd == "overview":
+            days = int(subargs[0]) if subargs else 7
+            ga4_overview(config, days)
+
+        else:
+            print(f"Unknown GA4 subcommand: {subcmd}")
+            print("Available: traffic, calls, pages, realtime, overview")
             sys.exit(1)
 
     # ── Cross-Platform ─────────────────────────────────────────
