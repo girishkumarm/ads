@@ -164,3 +164,74 @@ All ads: ORDER_NOW CTA, offer-specific copy, ACTIVE status.
 - No offer/urgency hook
 - Age targeting too wide (now fixed)
 - No UTM tracking
+
+## 2026-03-28 — Morning Audit (7 Agents)
+
+**Trigger:** Scheduled morning audit at 12:42 IST (delayed from 6:57 AM)
+
+**Findings:**
+- Google Ads API still down (Basic Access pending)
+- All 5 main campaigns healthy, no fatigue (all freq < 2.0)
+- JNR Video still star performer: 7.50% CTR, Rs 0.20/click
+- BTM Best of Bangalore flagged: 0.77% CTR, Rs 1.27/click — approaching pause threshold
+- JNR Hyper Local targeting verified correct (Women 18-30, Advantage+ OFF) — demographics data showing lifetime stats including pre-optimization period
+- Resort LPV drop-off: 41.4% (1,900 of 4,591 clicks) — flagged for review (APPROVAL ONLY)
+- Budget on track: Rs 2,032/day, MTD Rs 42,429
+- All prior changes verified, no drift detected
+
+**Actions taken:** None (all campaigns within thresholds)
+**Monitored:** BTM Best of Bangalore — will auto-pause if CTR < 0.5% for 3 consecutive days
+
+## 2026-03-28 — NEW: Basavanagudi Cafe Sale Campaign
+
+**Trigger:** User requested new campaign to sell cafe in Basavanagudi. Needs calls to 08747087475. Budget Rs 300/day. Urgent — sell within this month.
+
+**Campaign created:**
+- Campaign: "Basavanagudi Cafe For Sale - Calls" (ID: 6967751715144)
+- Adset: "Bangalore Entrepreneurs 28-55 - Cafe Sale" (ID: 6967751771544)
+- Budget: Rs 300/day
+- Targeting: Bangalore 30km, Age 28-55, Interests: Entrepreneurship, Restaurant mgmt, Business opportunity, Investment
+- Advantage+ OFF
+
+**Ads created (2):**
+1. "Basavanagudi Cafe Sale - Call Ad" (ID: 6967753534344) — Main pitch
+2. "Basavanagudi Cafe Sale - Investment Angle" (ID: 6967754092544) — Investor-focused
+- Both: CALL_NOW CTA → tel:+918747087475
+- Video reference: instagram.com/reel/DRxUJ3SE8Sh
+
+**Status:** All ACTIVE
+
+## 2026-03-28 — A/B Performance Comparison (Auto)
+
+**Jayanagar A/B (3-day data):**
+| Metric | Video (Original) | Hyper Local | Winner |
+|--------|-----------------|-------------|--------|
+| CTR | 7.50% | 2.42% | Video (+210%) |
+| CPC | Rs 0.17 | Rs 0.79 | Video (-78%) |
+| Cost/LPV | Rs 0.20 | Rs 1.68 | Video (-88%) |
+| LPV | 6,946 | 214 | Video (32x more) |
+
+**Result: JNR Video DOMINATES.** Budget shifted:
+- JNR Video: Rs 650 → Rs 750/day (+Rs 100)
+- JNR Hyper: Rs 200 → Rs 100/day (-Rs 100)
+
+**BTM A/B (3-day data):**
+| Metric | Video (Original) | Hyper Local | Winner |
+|--------|-----------------|-------------|--------|
+| CTR | 4.10% | 3.69% | Video (+11%) |
+| CPC | Rs 0.80 | Rs 0.62 | Hyper (-22%) |
+| Cost/LPV | Rs 1.03 | Rs 0.73 | Hyper (-29%) |
+| LPV | 1,635 | 619 | Video (2.6x more) |
+
+**Result: BTM too close to call.** Hyper winning on efficiency, Video on volume. No budget shift (under 30% threshold). Re-evaluate in 3 days.
+
+## 2026-03-28 — Resort Optimization: LPV → Contact Conversions (User-approved)
+
+**Trigger:** Girish said "I want people who call me not someone who just click and come to my website"
+
+**Action:** Changed Resort adset 6961151313144 optimization:
+- LANDING_PAGE_VIEWS → OFFSITE_CONVERSIONS
+- Promoted object: Pixel 789775680451708, custom_event_type: CONTACT
+- This makes FB optimize for phone clicks (Contact events) instead of page visits
+
+**Note:** Pixel currently has 0 Contact events — tracking code is installed but needs real call data to begin optimizing. FB will enter learning phase for 2-3 days.
