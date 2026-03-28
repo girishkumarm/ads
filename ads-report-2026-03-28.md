@@ -40,3 +40,64 @@ All campaigns below fatigue threshold (< 2.5 frequency). BTM Best of Blr at 1.66
 - No drift detected, no stale suggestions
 
 MORNING_AUDIT_COMPLETE: 12:45 IST
+
+## Facebook Ads — Today (2026-03-28)
+
+### By Campaign:
+| Campaign | Spend | Impr | Clicks | CTR | CPC | LPV | Vid Views |
+|----------|-------|------|--------|-----|-----|-----|-----------|
+| JNR Video | Rs 688 | 50,977 | 4,123 | 8.09% | Rs 0.17 | 3,286 | 18,526 |
+| JNR Hyper | Rs 119 | 5,443 | 169 | 3.10% | Rs 0.70 | 90 | 903 |
+| BTM Video | Rs 255 | 11,358 | 638 | 5.62% | Rs 0.40 | 504 | 3,432 |
+| BTM Hyper | Rs 83 | 3,986 | 168 | 4.21% | Rs 0.50 | 129 | 946 |
+| Resort | Rs 362 | 11,536 | 402 | 3.48% | Rs 0.90 | 249 | — |
+| Basavanagudi Sale | Rs 134 | 9,535 | 117 | 1.23% | Rs 1.15 | 30 | — |
+
+### Totals:
+| Metric | Today | Yesterday | MTD |
+|--------|-------|-----------|-----|
+| Spend | Rs 1,640 | Rs 1,996 | Rs 43,230 |
+| Impressions | 92,835 | 104,073 | 2,405,939 |
+| Clicks | 5,617 | 5,105 | 70,844 |
+| CTR | 6.05% | 4.91% | 2.94% |
+| LPV | 4,288 | 4,008 | ~40,600 |
+
+## Today's Actions
+- Morning audit (7 agents): 5 OK, 2 warnings, no auto-actions
+- A/B test: JNR Video dominates Hyper (+210% CTR). Budget shifted: Video 650→750, Hyper 200→100
+- Basavanagudi Cafe Sale campaign CREATED: 3 ads, Rs 300/day, CALL_NOW CTA
+- Resort optimization changed: LPV → OFFSITE_CONVERSIONS (Contact/calls) — user approved
+- BTM ads temporarily switched to Google Business link, then REVERTED per user request
+- BTM IPL Live Screening ad created
+- 10-agent deep analysis of cafe sales patterns completed
+- Cron log file created, pushed to GitHub
+- GA4 API: new refresh token installed, needs API enablement in GCP
+
+## Key Findings
+- JNR Video: 8.09% CTR — highest ever recorded (new record!)
+- BTM Video: 5.62% CTR — best since geo-fix optimization
+- BTM Hyper: 4.21% CTR at Rs 0.50/click — solid
+- Basavanagudi Sale: Rs 134 spent, 9,535 impressions, 30 LPV, 117 clicks
+- Both cafes hit ~Rs 9-9.5K revenue ceiling on Saturday (capacity constraint identified)
+- JNR: strong morning/afternoon, weak evening (family/brunch crowd)
+- BTM: weak morning, strong evening (IT/PG crowd)
+- Revenue ceiling likely operational, not ad-driven
+
+## Trends
+- JNR CTR: IMPROVING (8.09% today vs 7.50% 7d avg — new record)
+- BTM CTR: IMPROVING (5.62% today vs 4.06% yesterday — geo fix working)
+- BTM Hyper: stable (4.21% CTR, Rs 0.50 CPC)
+- Resort: stable (3.48% CTR, now optimizing for calls)
+- All frequencies healthy (< 2.0)
+- FB Token: 57.6 days remaining
+
+## Budget
+| Metric | Value |
+|--------|-------|
+| FB Today Spend | Rs 1,640 |
+| FB MTD | Rs 43,230 |
+| FB Projected Month | Rs 44,870 (3 days left) |
+| FB Token Expiry | 57.6 days (May 25) |
+| Google Balance | UNAVAILABLE (API down) |
+
+EVENING_REPORT_COMPLETE: 23:48 IST

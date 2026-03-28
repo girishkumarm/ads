@@ -235,3 +235,37 @@ All ads: ORDER_NOW CTA, offer-specific copy, ACTIVE status.
 - This makes FB optimize for phone clicks (Contact events) instead of page visits
 
 **Note:** Pixel currently has 0 Contact events — tracking code is installed but needs real call data to begin optimizing. FB will enter learning phase for 2-3 days.
+
+## 2026-03-28 — BTM Landing Page: Maps → Google Business 4.5★ (User-requested)
+
+**Trigger:** Girish pointed out BTM has 4.5 stars on Google (vs 3.7 on Zomato). Suggested switching landing page.
+
+**Action:** Updated 7 BTM ads to use Google Business link (https://share.google/SK8a5QqMuPD5duJ12):
+- Reel 4, 5, 6 (Video campaign): 6965037786344, 6965037785944, 6965037785744
+- Reel 4, 5, 6 (Hyper Local): 6965900492144, 6965900658944, 6965900823344  
+- 499 Combo Meal: 6966005900744
+- CTA: ORDER_NOW → Google Business Profile
+
+**Expected impact:** Higher conversion rate — visitors see 4.5★ Google rating instead of 3.7 Zomato rating.
+
+**Not updated (different creative format):** Reel 1, Reel 7, Near BTM Lake, IT Crowd WFC, Rate Us Zomato
+
+## 2026-03-28 — NEW: BTM IPL Live Screening Ad (User-requested)
+
+**Trigger:** Girish shared Instagram post of IPL screening at BTM, approved creating ad.
+
+**Ad created:**
+- Ad: "BTM - IPL Live Screening" (ID: 6968018544344)
+- Creative: 1453040656291451
+- Adset: BTM Video (6965037785144)
+- CTA: GET_DIRECTIONS → Google Maps
+- Copy: IPL Live Screening + match day vibes + Instagram link
+- Status: ACTIVE
+
+### DAY SUMMARY — 2026-03-28
+- Google spend: UNAVAILABLE (API down) | FB spend: Rs 1,640 | Total: Rs 1,640
+- Auto-actions: A/B budget shift (JNR Video 650→750, Hyper 200→100), BTM link change + revert
+- New campaigns: Basavanagudi Cafe Sale (Rs 300/day), BTM IPL Screening ad
+- Resort: optimization changed to Contact/calls (user-approved)
+- 10-agent deep analysis completed: revenue ceiling identified, action plan created
+- Notable: JNR Video hit 8.09% CTR (all-time record), BTM Video 5.62% (post-geo-fix best)

@@ -57,3 +57,12 @@
 
 ### ads-evening-report — pending (6:03 PM IST)
 **Status:** PENDING
+
+### ads-evening-report — 23:48 IST
+**Status:** COMPLETED
+- FB Today: Rs 1,640 | 92,835 impr | 5,617 clicks | 4,288 LPV
+- MTD: Rs 43,230
+- JNR Video: 8.09% CTR (new record)
+- BTM Video: 5.62% CTR (improving)
+- Report written, metrics persisted to JSON
+- Google Ads: API still down
