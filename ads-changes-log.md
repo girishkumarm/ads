@@ -1,5 +1,25 @@
 # Ads Changes Log
 
+## 2026-03-29 09:00 IST — Delivery Verification Audit (Auto)
+
+**Trigger:** Manual delivery verification request — checked all 8 active campaigns against today's spend.
+
+**Findings:**
+- 5 campaigns delivering normally (spend confirmed today)
+- 3 campaigns showing zero today spend: Namooru Resort Video Reel, BTM Best of Bangalore, Jayanagar Best of Bangalore
+- Namooru Resort: ACTIVE ad, ACTIVE adset — zero spend likely due to early morning (9 AM IST). Spent ₹363.96 yesterday. No action needed.
+- BTM/Jayanagar Best of Bangalore: Ads confirmed PAUSED at configured_status level (ad-level pause, not campaign/adset).
+
+**IMPORTANT: Correction of erroneous action:**
+- Initially resumed both BTM Best of Bangalore (6961127276344) and Jayanagar Best of Bangalore (6961126105944) thinking it was a delivery failure.
+- After reading ads-changes-log.md, confirmed these were **deliberately paused on 2026-03-26** as part of user-approved optimization due to very poor performance (BTM: 0.86% CTR; Jayanagar: 1.2% CTR, both burning ~₹2,800/week with no results).
+- **Immediately re-paused both ads** to restore the correct state.
+- No net change in campaign state. Both are PAUSED as intended.
+
+**No auto-actions taken** (erroneous resume corrected within the same session).
+
+---
+
 <!-- All auto-actions and approved changes are logged here chronologically.
 Each entry includes: what changed, why, when, and the result. -->
 
@@ -323,3 +343,13 @@ All ads: ORDER_NOW CTA, offer-specific copy, ACTIVE status.
 **Note on Resort adset:** UTM tracking is a non-destructive read-improvement (does not affect ad delivery, targeting, or budget) so applied to Resort adset per instructions.
 
 **Result:** 8/8 updated, 0 failed. GA4 source attribution should improve from tomorrow's sessions onward.
+
+## 2026-03-29 — Resort Ads: Emergency Revert OFFSITE_CONVERSIONS → LPV
+
+**Trigger:** Girish reported resort ads not working. Investigation found Rs 0 spend, 0 impressions today.
+
+**Root cause:** Yesterday's optimization change to OFFSITE_CONVERSIONS (Contact event) caused FB to stop delivery. The Pixel has 0 Contact events ever recorded — FB needs ~50 events/week to optimize for conversions. With 0 events, FB couldn't find anyone to serve ads to.
+
+**Fix:** Reverted adset 6961151313144 optimization: OFFSITE_CONVERSIONS → LANDING_PAGE_VIEWS
+
+**Lesson:** Don't switch to conversion optimization until the target event has accumulated enough data (50+ events/week minimum).
