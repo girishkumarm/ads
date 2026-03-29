@@ -156,5 +156,57 @@
     "google": {
       "status": "api_down"
     }
+  },
+  {
+    "date": "2026-03-29",
+    "fb": {
+      "total_spend": 2998,
+      "total_impressions": 180774,
+      "total_clicks": 8253,
+      "total_lpv": 5691,
+      "avg_ctr": 4.56,
+      "campaigns": {
+        "jnr_video": {
+          "spend": 907,
+          "ctr": 7.43,
+          "lpv": 4517
+        },
+        "btm_video": {
+          "spend": 404,
+          "ctr": 2.74,
+          "lpv": 306
+        },
+        "jnr_hyper": {
+          "spend": 110,
+          "ctr": 2.75,
+          "lpv": 78
+        },
+        "btm_hyper": {
+          "spend": 216,
+          "ctr": 2.92,
+          "lpv": 168
+        },
+        "resort": {
+          "spend": 869,
+          "ctr": 2.51,
+          "lpv": 476
+        },
+        "basavanagudi_sale": {
+          "spend": 492,
+          "ctr": 2.09,
+          "lpv": 146
+        }
+      },
+      "mtd_spend": 46228
+    },
+    "google": {
+      "status": "api_down"
+    },
+    "ga4": {
+      "sessions": 625,
+      "calls": 15,
+      "fb_sessions": 208,
+      "google_cpc_sessions": 43
+    }
   }
 ]
