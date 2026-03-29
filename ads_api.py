@@ -1170,7 +1170,7 @@ GA4_BASE = "https://analyticsdata.googleapis.com/v1beta"
 
 def ga4_property_id(config):
     """Get GA4 property ID from config with fallback to hardcoded value."""
-    return config.get("google_ads", {}).get("ga4_property_id", "454912366")
+    return config.get("google_ads", {}).get("ga4_property_id", "526971054")
 
 
 def ga4_run_report(config, dimensions, metrics, days=7):

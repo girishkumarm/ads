@@ -3,6 +3,36 @@
 <!-- All auto-actions and approved changes are logged here chronologically.
 Each entry includes: what changed, why, when, and the result. -->
 
+## 2026-03-29 — BTM IPL Live Screening Ad Fixed (User-requested)
+
+**Issue:** Ad 6968018544344 ("BTM - IPL Live Screening") was WITH_ISSUES for 24+ hours. Root cause: `link_data.link` was set to `https://www.google.com/maps/place/Brewing+Untold+Stories+BTM` — a text-based Google Maps search URL that Facebook cannot validate, causing the creative to fail review.
+
+**Action:**
+1. Old broken ad (6968018544344) confirmed PAUSED — left in place as-is.
+2. New creative (1646480656668195) created with same IPL copy and image hash (`124e4c6f2092ff177a51f6117fbf9c75`), but using `https://www.zomato.com/bangalore/brewing-untold-stories-btm-bangalore` as `link_data.link` and `GET_DIRECTIONS` CTA without a `value.link` (FB uses page location data for directions).
+3. New ad "BTM - IPL Live Screening v2" (ID: 6968161515944) created in adset 6965037785144, page 252991174574471, status: ACTIVE (IN_PROCESS — entering review queue).
+
+**Root cause note:** Facebook API rejects all Google Maps URLs in `call_to_action.value.link` for GET_DIRECTIONS CTAs. The correct pattern is to omit the `value.link` entirely and let FB use the page's registered location.
+
+---
+
+## 2026-03-29 — Basavanagudi Cafe Sale Adset Optimization Goal Fix (User-requested)
+
+**Trigger:** User identified high CPC (Rs 1.15–1.21) and low CTR (1.23%) on Basavanagudi Cafe For Sale campaign. Optimization was set to LANDING_PAGE_VIEWS but the landing page is Google Maps — counterproductive for a call-focused campaign with CALL_NOW CTA.
+
+**Action:**
+- Adset `6967751771544` (Bangalore Entrepreneurs 28-55 - Cafe Sale): `optimization_goal` changed from `LANDING_PAGE_VIEWS` → `LINK_CLICKS`
+- Billing event kept as `IMPRESSIONS` (valid pairing)
+
+**Ad Status Check (all 3 ads):**
+- `6967755240344` — Basavanagudi Cafe Sale - Dream Cafe (Reel 2): ACTIVE / effective_status ACTIVE
+- `6967754092544` — Basavanagudi Cafe Sale - Investment Angle: ACTIVE / effective_status ACTIVE
+- `6967753534344` — Basavanagudi Cafe Sale - Call Ad: ACTIVE / effective_status ACTIVE
+
+**Expected outcome:** Facebook will now optimize delivery toward users likely to click the call link rather than users likely to load/view a landing page. Should reduce CPC and improve CTR for a CALL_NOW objective.
+
+---
+
 ## 2026-03-26 — Jayanagar FB Ads Optimization (User-requested)
 
 **Trigger:** User reported no sales for 1 week, requested full optimization on Jayanagar only (not BTM).
@@ -269,3 +299,27 @@ All ads: ORDER_NOW CTA, offer-specific copy, ACTIVE status.
 - Resort: optimization changed to Contact/calls (user-approved)
 - 10-agent deep analysis completed: revenue ceiling identified, action plan created
 - Notable: JNR Video hit 8.09% CTR (all-time record), BTM Video 5.62% (post-geo-fix best)
+
+## 2026-03-29 — UTM Tracking Fix (All Active Adsets)
+
+**Issue:** GA4 showing 309 sessions as "(not set)" source — FB ads missing UTM parameters.
+
+**Fix applied:** Added `url_tags` to all 8 active adsets via Facebook Graph API v21.0.
+
+**UTM format:** `utm_source=facebook&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}`
+
+**Adsets updated:**
+| Adset ID | Adset Name | Campaign |
+|----------|-----------|---------|
+| 6967751771544 | Bangalore Entrepreneurs 28-55 - Cafe Sale | Basavanagudi Cafe For Sale - Calls |
+| 6965900331144 | BTM Women 18-30 - Hyper Local | BUS Cafe BTM - Hyper Local |
+| 6965890859944 | Women 18-30 - 3km Jayanagar - LPV | BUS Cafe Jayanagar - Hyper Local |
+| 6965037785144 | New Traffic ad set | BUS Cafe BTM - Video Ads |
+| 6963107310544 | New Traffic ad set | BUS Cafe Jayanagar - Video Ads |
+| 6961151313144 | Namooru Resort - Video Reel Ads Ad Set | Namooru Resort - Video Reel Ads Campaign |
+| 6961127276744 | BUS Cafe BTM Layout - Best of Bangalore Ad Set | BUS Cafe BTM Layout - Best of Bangalore Campaign |
+| 6961126106144 | BUS Cafe Jayanagar - Best of Bangalore Ad Set | BUS Cafe Jayanagar - Best of Bangalore Campaign |
+
+**Note on Resort adset:** UTM tracking is a non-destructive read-improvement (does not affect ad delivery, targeting, or budget) so applied to Resort adset per instructions.
+
+**Result:** 8/8 updated, 0 failed. GA4 source attribution should improve from tomorrow's sessions onward.

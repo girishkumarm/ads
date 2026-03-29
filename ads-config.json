@@ -1,0 +1,29 @@
+{
+  "google_ads": {
+    "developer_token": "KggLWrvQKthmC-Ov231mHQ",
+    "client_id": "406298617381-j58p700q6d2vs2h1fnv2a1hbg1b6fshd.apps.googleusercontent.com",
+    "client_secret": "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",
+    "refresh_token": "1//0guxAaKqd3iKUCgYIARAAGBASNwF-L9IrmZJTIO7n2_gr5UAUZSRHOf6QOTV9hVGK8XuJqJg0Pn2pAUEGxVC1eN-MaaOWEtC-5WE",
+    "customer_id": "2995160429",
+    "manager_id": "3947684492",
+    "login_customer_id": "3947684492",
+    "cafe_customer_id": "7614460903",
+    "ga4_property_id": "526971054"
+  },
+  "facebook": {
+    "app_id": "2118349835685965",
+    "app_secret": "2feb4b9e245c52ecbb9d617834c26aee",
+    "access_token": "EAAeGoMF3UE0BRJG2026qBm5VpZADFS4ZBMBZCyev835DZBEqqHIcqJflUqn90klARupHg2NJYGFoVJhBBuyLyPZCuamsgUMZBj4WEsBuMzZAMJzYDV4ZCZAYP06UpxkNyOT8ZAploG91stE69vrFZCTZBeeD74HbZCs5usphVjlWveZBggxtIi8VWvabxoeuXhk2fw",
+    "ad_account_id": "act_511239865642774",
+    "pixel_id": "789775680451708"
+  },
+  "google_business": {
+    "gbp_account_id": "",
+    "gbp_location_name": ""
+  },
+  "godaddy": {
+    "api_key": "dKYSZKLVRQTy_JdaaMsqvTNWheDffDrE3qU",
+    "api_secret": "EcfUwmhJ6aR2v12mSfmPzL",
+    "domain": "namooru.com"
+  }
+}
