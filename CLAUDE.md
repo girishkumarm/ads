@@ -217,38 +217,48 @@ Both are under MCC 394-768-4492. The `cafe_customer_id` field in ads-config.json
 
 When querying Google Ads data, run commands for BOTH accounts and combine in reports.
 
-## Google Ads Playwright Fallback (TEMPORARY)
+## Google Ads API Status
 
-**STATUS:** The Google Ads API developer token is currently "Test Account" access — cannot access production accounts. Basic Access has been applied for (takes 1-3 business days). Until approved, use Playwright browser automation to get Google Ads data.
+**STATUS:** Basic Access APPROVED (as of April 2026). API is fully operational.
 
-**How to check if API is working:**
+**If API returns errors, troubleshoot:**
 ```bash
-python3 ads_api.py google campaigns
-```
-If this returns data (not 404/error), the API is approved — **stop using Playwright and switch to API**.
+# 1. Delete stale token and re-auth
+rm -f .ads-token.json
+python3 ads_api.py auth google
 
-**Playwright login credentials:**
+# 2. Test campaigns
+python3 ads_api.py google campaigns
+
+# 3. If 404: verify login_customer_id is MCC ID (3947684492) in ads-config.json
+# 4. If 403: token scope issue — need refresh token with adwords+analytics scopes
+```
+
+**ads-config.json google_ads section MUST have:**
+```json
+{
+  "developer_token": "KggLWrvQKthmC-Ov231mHQ",
+  "client_id": "406298617381-j58p700q6d2vs2h1fnv2a1hbg1b6fshd.apps.googleusercontent.com",
+  "client_secret": "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",
+  "refresh_token": "THE_LATEST_REFRESH_TOKEN",
+  "customer_id": "2995160429",
+  "cafe_customer_id": "7614460903",
+  "manager_id": "3947684492",
+  "login_customer_id": "3947684492",
+  "ga4_property_id": "454912366"
+}
+```
+**CRITICAL:** `login_customer_id` MUST be the MCC ID `3947684492` (no dashes), NOT the individual account ID.
+
+**Playwright fallback (if API is down):**
+If the API is temporarily broken, you can use Playwright to scrape Google Ads data. Xvfb is on :99.
 
 | Account | URL | Email | Password |
 |---------|-----|-------|----------|
 | Resort | ads.google.com | namooruresortsads@gmail.com | Yuvan@123. |
 | Cafe | ads.google.com | btm@brewinguntoldstories.com | Yuvan@123. |
 
-**IMPORTANT:** If Google asks for mobile OTP or any 2FA/approval during login:
-1. Send the prompt to Girish via Telegram: `python3 /root/stocks/notify.py send "Google Ads login needs OTP/approval for [account]. Please check your phone." --title "OTP Needed" --priority high`
-2. Wait for Girish to respond via Telegram with the OTP or confirm approval
-3. NEVER enter OTPs yourself — always ask Girish
-
-**What to scrape via Playwright:**
-- Campaign names, status, daily budget
-- Clicks, impressions, CTR, CPC, cost, conversions (from Overview page)
-- Search terms report (from Keywords → Search terms)
-- Account balance (from Billing)
-- Any warnings/recommendations
-
-**Xvfb display:** `export DISPLAY=:99` (already running on VPS via systemd)
-
-**Once API Basic Access is approved:** Delete this entire "Playwright Fallback" section from CLAUDE.md and switch all Google Ads operations to `ads_api.py` commands. The Playwright workaround is temporary only.
+If Google asks for OTP → send Telegram message to Girish and wait for response. NEVER enter OTPs yourself.
 
 ## Troubleshooting
 
