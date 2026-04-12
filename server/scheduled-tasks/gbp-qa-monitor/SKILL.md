@@ -27,11 +27,17 @@ DATE: Run `TZ='Asia/Kolkata' date +%Y-%m-%d` to get today's date.
 
 ### STEP 1: Fetch Q&A
 
+**NOTE:** The `gbp questions` API command is NOT yet implemented in `ads_api.py`. The GBP Q&A API requires the My Business Q&A endpoint which may not be available.
+
+**Workaround:** Use Google Maps scraping via Playwright if Q&A monitoring is needed, or skip this step and notify Girish that Q&A monitoring requires manual checks until the API is implemented.
+
 ```bash
+# If gbp questions becomes available:
 python3 /root/ads/ads_api.py gbp questions
+# Otherwise, notify that this feature is not yet available and abort gracefully
 ```
 
-Identify questions that:
+If the command is available, identify questions that:
 - Have NO answer from the business owner
 - Were asked in the last 7 days
 

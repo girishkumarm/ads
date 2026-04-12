@@ -59,13 +59,14 @@ Parse the URL for:
 
 If any UTM parameter is missing, flag as WARNING.
 
-### STEP 2: Check Google Ads Final URLs
+### STEP 2: Check Google Ads Final URLs (BOTH Accounts)
 
+Check BOTH Google Ads accounts (Resort CID 2995160429 + Cafe CID 7614460903):
 ```bash
-python3 /root/ads/ads_api.py google campaigns
+python3 /root/ads/ads_api.py google campaigns   # Run for each account
 ```
 
-For each ENABLED campaign:
+For each ENABLED campaign in BOTH accounts:
 ```bash
 python3 /root/ads/ads_api.py google ads {CAMPAIGN_ID}
 ```

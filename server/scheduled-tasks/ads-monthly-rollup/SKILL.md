@@ -34,10 +34,10 @@ Extract daily metrics for each day.
 **From ads-metrics-history.json:**
 Read weekly snapshots for the report month.
 
-**From API (for any gaps):**
+**From API (for any gaps — query BOTH Google Ads accounts: Resort CID 2995160429 + Cafe CID 7614460903):**
 ```bash
-# Google — full month
-python3 /root/ads/ads_api.py google campaigns
+# Google — full month (run for BOTH accounts)
+python3 /root/ads/ads_api.py google campaigns   # For each account
 python3 /root/ads/ads_api.py google metrics {CAMPAIGN_ID} 30
 
 # Facebook — full month
@@ -111,7 +111,7 @@ Generated: {DATE} {TIME} IST
 - Blended cost per action: Rs {X} (MoM: {+/-Y}%)
 - Budget efficiency: {X}% utilized
 
-## Google Ads — Namooru Ecostay Resort
+## Google Ads — Namooru Ecostay Resort (CID 2995160429)
 
 | Metric | This Month | Last Month | Change |
 |--------|-----------|------------|--------|
@@ -125,6 +125,20 @@ Generated: {DATE} {TIME} IST
 
 Budget remaining: Rs X
 Fund depletion estimate: {DATE}
+
+## Google Ads — BUS Cafe (CID 7614460903)
+
+| Metric | This Month | Last Month | Change |
+|--------|-----------|------------|--------|
+| Spend | Rs X | Rs Y | +/-Z% |
+| Clicks | X | Y | +/-Z% |
+| Impressions | X | Y | +/-Z% |
+| CTR | X% | Y% | +/-Z% |
+| CPC | Rs X | Rs Y | +/-Z% |
+| Conversions | X | Y | +/-Z% |
+| Cost/Conv | Rs X | Rs Y | +/-Z% |
+
+Budget remaining: Rs X
 
 ## Facebook Ads — BUS Cafe + Resort
 

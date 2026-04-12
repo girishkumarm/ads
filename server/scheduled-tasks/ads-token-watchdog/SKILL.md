@@ -36,7 +36,7 @@ python3 /root/ads/ads_api.py auth google
   Troubleshooting:
   1. Check if OAuth refresh token expired
   2. Verify credentials in ads-config.json
-  3. Try: rm -f .google-token.json && python3 /root/ads/ads_api.py auth google
+  3. Try: rm -f .ads-token.json && python3 /root/ads/ads_api.py auth google
   4. If still failing, may need to re-authorize via browser
 
   Ads WILL STOP if this isn't fixed before morning audit." --title "Google Auth Failed" --priority urgent --audience girish
@@ -50,11 +50,8 @@ python3 /root/ads/ads_api.py auth facebook
 
 **If success:**
 - Record as FB_AUTH: OK
-- Check token expiry:
-  ```bash
-  python3 /root/ads/ads_api.py fb token-info
-  ```
-  Extract `expires_at` or `data_access_expires_at`.
+- The `auth facebook` command already outputs token validity and days until expiry.
+  Extract expiry info from the auth output (it calls `fb_debug_token` internally).
 
 **If failure:**
 - Record as FB_AUTH: FAILED
@@ -66,7 +63,7 @@ python3 /root/ads/ads_api.py auth facebook
   1. FB long-lived tokens last ~60 days
   2. Check if token in ads-config.json is still valid
   3. May need to generate new token at developers.facebook.com
-  4. Or use: python3 /root/ads/ads_api.py fb refresh-token
+  4. Generate new token at developers.facebook.com and update ads-config.json
 
   FB ads monitoring is DOWN until this is fixed." --title "FB Auth Failed" --priority urgent --audience girish
   ```

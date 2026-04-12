@@ -36,16 +36,36 @@ PRIORITY_EMOJI = {
     "low":    "ℹ️",
 }
 
-def load_config():
+def load_config(bot_name=None):
+    """Load config. If bot_name specified, load that bot's token from ads-config.json."""
     with open(CONFIG_PATH) as f:
-        return json.load(f)
+        config = json.load(f)
+    if bot_name:
+        ads_config_path = os.path.join(SCRIPT_DIR, "ads-config.json")
+        with open(ads_config_path) as f:
+            ads_config = json.load(f)
+        bot_cfg = ads_config.get("telegram_bots", {}).get(bot_name, {})
+        if bot_cfg:
+            config["bot_token"] = bot_cfg["token"]
+            # Use bot-specific users as chat_ids for polling
+            users = bot_cfg.get("users", {})
+            if users:
+                config["chat_ids"] = [int(uid) for uid in users.keys()]
+                config["chat_id"] = int(list(users.keys())[0])
+                config["chat_id_girish"] = int(bot_cfg.get("admin_chat_id", list(users.keys())[0]))
+            # Store bot metadata for access control
+            config["_bot_name"] = bot_name
+            config["_bot_scope"] = bot_cfg.get("scope", "")
+            config["_bot_users"] = users
+    return config
 
-def send_message(text, title=None, priority="default", tags=None, audience="all"):
+def send_message(text, title=None, priority="default", tags=None, audience="all", bot=None):
     """Send a message to user via Telegram bot.
     audience: 'all' = both Girish + Pooja (trading alerts)
               'girish' = only Girish (resort/ads/SEO stuff)
+    bot: optional bot name (e.g. 'btm_cafe') to use a different bot token
     """
-    config = load_config()
+    config = load_config(bot_name=bot)
 
     # Format message with title and priority emoji
     emoji = PRIORITY_EMOJI.get(priority, "")
@@ -120,9 +140,9 @@ def send_message(text, title=None, priority="default", tags=None, audience="all"
                     break
     return success
 
-def get_updates(offset=None, timeout_sec=5):
+def get_updates(offset=None, timeout_sec=5, bot=None):
     """Fetch updates from Telegram getUpdates API."""
-    config = load_config()
+    config = load_config(bot_name=bot)
     params = {"timeout": timeout_sec, "allowed_updates": ["message"]}
     if offset is not None:
         params["offset"] = offset
@@ -146,13 +166,14 @@ def get_latest_offset():
         return updates[-1]["update_id"] + 1
     return None
 
-def _get_offset_file():
+def _get_offset_file(bot=None):
     """Path to persisted Telegram offset file."""
-    return os.path.join(SCRIPT_DIR, ".telegram-offset")
+    suffix = f"-{bot}" if bot else ""
+    return os.path.join(SCRIPT_DIR, f".telegram-offset{suffix}")
 
-def _load_offset():
+def _load_offset(bot=None):
     """Load persisted offset to avoid re-processing messages."""
-    path = _get_offset_file()
+    path = _get_offset_file(bot=bot)
     try:
         if os.path.exists(path):
             with open(path) as f:
@@ -161,18 +182,19 @@ def _load_offset():
         pass
     return None
 
-def _save_offset(offset):
+def _save_offset(offset, bot=None):
     """Persist offset so future poll calls skip already-seen messages."""
-    path = _get_offset_file()
+    path = _get_offset_file(bot=bot)
     try:
         with open(path, "w") as f:
             f.write(str(offset))
     except IOError:
         pass
 
-def poll_replies(since="2m"):
+def poll_replies(since="2m", bot=None):
     """Get recent messages from user, filtered by time window.
-    since: e.g. '2m' for last 2 minutes, '5m' for last 5 minutes, '1h' for 1 hour."""
+    since: e.g. '2m' for last 2 minutes, '5m' for last 5 minutes, '1h' for 1 hour.
+    bot: optional bot name to poll a different bot."""
     import re
     # Parse since into seconds (supports s, m, h)
     match = re.match(r'(\d+)([smh]?)', since)
@@ -184,10 +206,11 @@ def poll_replies(since="2m"):
     else:
         since_secs = 120
 
-    config = load_config()
+    config = load_config(bot_name=bot)
     # Use persisted offset to avoid re-processing old messages
-    offset = _load_offset()
-    updates = get_updates(offset=offset)
+    # Use bot-specific offset file if polling a named bot
+    offset = _load_offset(bot=bot)
+    updates = get_updates(offset=offset, bot=bot)
     chat_ids = [str(c) for c in config.get("chat_ids", [config["chat_id"]])]
     now = int(time.time())
     messages = []
@@ -245,7 +268,7 @@ def poll_replies(since="2m"):
                 messages.append(text)
     # Advance offset so these messages are never re-processed
     if max_update_id is not None:
-        _save_offset(max_update_id + 1)
+        _save_offset(max_update_id + 1, bot=bot)
     if messages:
         for msg_text in messages:
             print(msg_text)
@@ -419,13 +442,16 @@ if __name__ == "__main__":
                 return args[idx + 1]
         return default
 
+    bot_name = get_flag("--bot")
+
     if command == "send":
         send_message(
             message or "Test notification",
             title=get_flag("--title"),
             priority=get_flag("--priority", "default"),
             tags=get_flag("--tags"),
-            audience=get_flag("--audience", "all")
+            audience=get_flag("--audience", "all"),
+            bot=bot_name
         )
 
     elif command == "ask":
@@ -446,7 +472,7 @@ if __name__ == "__main__":
         )
 
     elif command == "poll":
-        poll_replies(get_flag("--since", "5m"))
+        poll_replies(get_flag("--since", "5m"), bot=bot_name)
 
     else:
         print(f"Unknown command: {command}")

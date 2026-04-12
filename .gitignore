@@ -19,3 +19,23 @@ ads-metrics-history.json
 .telegram-offset
 telegram-config.json
 media-inbox/
+
+# Telegram offset files
+.telegram-offset-*
+
+# Bot logs
+ads-bot.log
+*.log
+
+# One-time scripts
+gbp_oauth_setup.py
+submit_gbp_form.py
+
+# Screenshots
+*.png
+
+# Voice reply (has API tokens in imports)
+voice_reply.py
+
+# Gemma local AI
+gemma.py

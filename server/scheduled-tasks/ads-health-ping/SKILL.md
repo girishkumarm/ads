@@ -82,13 +82,24 @@ python3 /root/ads/ads_api.py fb ads {ADSET_ID}
     Review in Ads Manager or reply with instructions." --title "Ad Disapproved" --priority high --audience girish
     ```
 
-### STEP 3: Google Ads Balance Check
+### STEP 3: Zero-Spend Active Campaign Check (CRITICAL)
 
+**IMPORTANT:** Never trust campaign status alone. An ACTIVE campaign can have zero delivery.
+
+For BOTH Facebook and Google Ads, check each ACTIVE/ENABLED campaign:
+- If a campaign is ACTIVE/ENABLED but has Rs 0 spend today (after 10 AM IST), flag as **CRITICAL**:
 ```bash
-python3 /root/ads/ads_api.py google budget
+python3 /root/stocks/notify.py send "CRITICAL: Campaign [NAME] is ACTIVE but has Rs 0 spend today. Possible delivery issue — check billing, targeting, or ad disapprovals." --title "Zero Delivery" --priority urgent --audience girish
 ```
 
-**Checks:**
+### STEP 4: Google Ads Balance Check (BOTH Accounts)
+
+Check BOTH Google Ads accounts (Resort CID 2995160429 + Cafe CID 7614460903):
+```bash
+python3 /root/ads/ads_api.py google budget   # Run for each account
+```
+
+**Checks (per account):**
 - Balance < Rs 3,000 → CRITICAL alert
 - Balance < Rs 5,000 → HIGH alert
 - Balance < Rs 10,000 → INFO note
@@ -98,7 +109,7 @@ python3 /root/ads/ads_api.py google budget
 python3 /root/stocks/notify.py send "CRITICAL: Google Ads balance is Rs {BALANCE}. Ads will stop delivering soon. Top up immediately." --title "Google Funds Critical" --priority urgent --audience girish
 ```
 
-### STEP 4: Send Summary (Only if Issues Found)
+### STEP 5: Send Summary (Only if Issues Found)
 
 If any issues were detected:
 ```bash

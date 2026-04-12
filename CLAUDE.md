@@ -71,6 +71,17 @@ Automated 4-platform ads + SEO management system. Claude Code runs scheduled tas
 | `install-scripts/meta-pixel.html` | Meta Pixel code ready to install on namooru.com |
 | `install-scripts/schema-markup.html` | JSON-LD schema markup for namooru.com |
 
+## Business Strategy Docs
+
+Reference docs with campaign IDs, budgets, and targeting details for each business:
+
+| File | Contents |
+|------|----------|
+| `docs/cafe-jayanagar.md` | BUS Cafe Jayanagar — FB campaign IDs, adsets, budgets |
+| `docs/cafe-btm.md` | BUS Cafe BTM Layout — FB campaign IDs, adsets, budgets |
+| `docs/cafe-sale.md` | Cafe sale ads — Jayanagar + Basavanagudi |
+| `docs/resort.md` | Namooru Resort — Google Ads + Facebook Ads details |
+
 ## Ads API Quick Reference
 
 ```bash

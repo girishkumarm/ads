@@ -19,13 +19,14 @@ DATE: Run `TZ='Asia/Kolkata' date +%Y-%m-%d` to get today's date.
    ```
    If fails, notify and abort.
 
-### STEP 1: Google Auction Insights
+### STEP 1: Google Auction Insights (BOTH Accounts)
 
+Check BOTH Google Ads accounts (Resort CID 2995160429 + Cafe CID 7614460903):
 ```bash
-python3 /root/ads/ads_api.py google campaigns
+python3 /root/ads/ads_api.py google campaigns   # Run for each account
 ```
 
-For each ENABLED campaign:
+For each ENABLED campaign in BOTH accounts:
 ```bash
 python3 /root/ads/ads_api.py google auction-insights {CAMPAIGN_ID} 7
 ```

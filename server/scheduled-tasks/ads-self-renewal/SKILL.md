@@ -1,6 +1,6 @@
 ---
 name: ads-self-renewal
-description: Daily 6:00 AM IST — Verify all scheduled tasks exist and are active. Flag any missing tasks for re-creation.
+description: Daily 6:50 AM IST — Verify all scheduled tasks exist and are active. Flag any missing tasks for re-creation.
 ---
 
 ## SELF-RENEWAL — SCHEDULED TASK HEALTH CHECK
@@ -19,20 +19,22 @@ The following scheduled tasks MUST exist and be enabled:
 
 | Task ID | Schedule (cron) | Description |
 |---------|----------------|-------------|
-| ads-morning-audit | `27 1 * * 1-5` (6:57 AM IST) | Morning 7-agent audit |
-| ads-evening-report | `33 12 * * 1-5` (6:03 PM IST) | Evening daily report |
+| ads-self-renewal | `20 1 * * *` (6:50 AM IST) | This task (self-check) |
+| ads-morning-audit | `27 1 * * *` (6:57 AM IST) | Morning 7-agent audit |
 | gbp-daily-seo | `0 2 * * *` (7:30 AM IST) | GBP review/insights check |
-| ads-health-ping | `0 */2 * * *` (every 2 hours) | Quick health checks |
-| ads-midday-pulse | `30 6 * * 1-5` (12:00 PM IST) | Midday pacing check |
-| ads-budget-optimizer | `0 4 * * 1-5` (9:30 AM IST) | Budget shift by efficiency |
-| ads-approval-reminder | `0 8 * * *` (1:30 PM IST) | Pending suggestion follow-up |
 | ads-creative-health | `0 3 * * 1,4` (8:30 AM Mon/Thu) | URL & UTM validation |
-| ads-ab-test-manager | `0 3 * * 1,5` (8:30 AM Mon/Fri) | A/B test setup & evaluation |
+| ads-ab-test-manager | `0 3 * * 1,5` (8:30 AM Mon/Fri) | A/B test setup (Mon) & evaluation (Fri) |
+| ads-budget-optimizer | `0 4 * * 1-5` (9:30 AM IST) | Budget shift by efficiency |
+| gbp-qa-monitor | `0 5 * * *` (10:30 AM IST) | GBP Q&A monitoring |
+| ads-midday-pulse | `30 6 * * 1-5` (12:00 PM IST) | Midday pacing check |
+| ads-approval-reminder | `0 8 * * *` (1:30 PM IST) | Pending suggestion follow-up |
+| ads-evening-report | `33 12 * * *` (6:03 PM IST) | Evening daily report |
+| ads-token-watchdog | `0 18 * * *` (11:30 PM IST) | Auth token health check |
+| ads-health-ping | `0 */2 * * *` (every 2 hours) | Quick health checks |
+| ads-weekly-review | `17 0 * * 1` (5:47 AM Mon) | Deep weekly analysis |
+| godaddy-seo-monitor | `30 0 * * 1` (6:00 AM Mon) | Domain/SSL/DNS audit |
 | ads-competitor-watch | `0 21 * * 0` (2:30 AM Sun) | Weekly competitor intel |
 | ads-forecast | `0 21 * * 0` (2:30 AM Sun) | Weekly forecast & projections |
-| ads-token-watchdog | `0 18 * * *` (11:30 PM IST) | Auth token health check |
-| ads-self-renewal | `30 0 * * *` (6:00 AM IST) | This task (self-check) |
-| gbp-qa-monitor | `0 5 * * *` (10:30 AM IST) | GBP Q&A monitoring |
 | ads-monthly-rollup | `0 22 1 * *` (3:30 AM 1st of month) | Monthly summary report |
 
 ### STEP 2: Check Existing Tasks

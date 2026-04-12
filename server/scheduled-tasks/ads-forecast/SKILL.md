@@ -22,12 +22,13 @@ DATE: Run `TZ='Asia/Kolkata' date +%Y-%m-%d` to get today's date.
 
 ### STEP 1: Monthly Spend Projection
 
-**Google Ads:**
+**Google Ads (BOTH accounts — Resort CID 2995160429 + Cafe CID 7614460903):**
 ```bash
-python3 /root/ads/ads_api.py google campaigns
-# For each ENABLED campaign, get last 30 days:
+# Run for BOTH Google Ads accounts
+python3 /root/ads/ads_api.py google campaigns   # For each account
+# For each ENABLED campaign in BOTH accounts, get last 30 days:
 python3 /root/ads/ads_api.py google metrics {CAMPAIGN_ID} 30
-python3 /root/ads/ads_api.py google budget
+python3 /root/ads/ads_api.py google budget   # For each account
 ```
 
 **Facebook Ads:**
@@ -45,10 +46,11 @@ python3 /root/ads/ads_api.py fb metrics {CAMPAIGN_ID} 30
 - WMA daily spend = weighted sum / total weights
 - Monthly projection = WMA daily spend * days in current month
 
-### STEP 2: Google Fund Depletion Date
+### STEP 2: Google Fund Depletion Date (BOTH Accounts)
 
+Check BOTH accounts (Resort CID 2995160429 + Cafe CID 7614460903):
 ```bash
-python3 /root/ads/ads_api.py google budget
+python3 /root/ads/ads_api.py google budget   # Run for each account
 ```
 
 - Current balance: Rs X
@@ -98,7 +100,15 @@ Append this week's summary to `/root/ads/ads-metrics-history.json`:
 ```json
 {
   "week_of": "{DATE}",
-  "google": {
+  "google_resort": {
+    "daily_avg_spend": X,
+    "daily_avg_clicks": X,
+    "avg_cpc": X,
+    "avg_ctr": X,
+    "conversions": X,
+    "balance": X
+  },
+  "google_cafe": {
     "daily_avg_spend": X,
     "daily_avg_clicks": X,
     "avg_cpc": X,

@@ -275,59 +275,75 @@ def google_get_token(config):
     return token
 
 
-def google_gaql(config, query):
-    """Execute a GAQL query via Google Ads searchStream API."""
+_google_ads_client = None
+
+def _get_google_ads_client(config):
+    """Get or create a cached GoogleAdsClient using gRPC."""
+    global _google_ads_client
+    if _google_ads_client is not None:
+        return _google_ads_client
+    from google.ads.googleads.client import GoogleAdsClient
     gc = config["google_ads"]
-    token = google_get_token(config)
-    if not token:
-        return None
-
-    customer_id = gc["customer_id"].replace("-", "")
-    url = f"{GOOGLE_ADS_BASE}/customers/{customer_id}/googleAds:searchStream"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "developer-token": gc["developer_token"],
-        "Content-Type": "application/json",
+    client_config = {
+        "developer_token": gc["developer_token"],
+        "client_id": gc["client_id"],
+        "client_secret": gc["client_secret"],
+        "refresh_token": gc["refresh_token"],
+        "use_proto_plus": False,
     }
-    # Add login-customer-id if present (for MCC accounts)
-    if gc.get("login_customer_id"):
-        headers["login-customer-id"] = gc["login_customer_id"].replace("-", "")
+    login_cid = gc.get("login_customer_id", "").replace("-", "")
+    if login_cid:
+        client_config["login_customer_id"] = login_cid
+    _google_ads_client = GoogleAdsClient.load_from_dict(client_config)
+    return _google_ads_client
 
-    data = {"query": query}
-    result, status = http_request("POST", url, data=data, headers=headers)
 
-    if status == 401:
-        # Token expired — clear cache and retry once
-        if os.path.exists(TOKEN_CACHE):
-            cache = {}
+def google_gaql(config, query):
+    """Execute a GAQL query via Google Ads searchStream gRPC API."""
+    from google.protobuf.json_format import MessageToDict
+    gc = config["google_ads"]
+    customer_id = gc["customer_id"].replace("-", "")
+
+    try:
+        client = _get_google_ads_client(config)
+        service = client.get_service("GoogleAdsService")
+        stream = service.search_stream(customer_id=customer_id, query=query)
+        rows = []
+        for batch in stream:
+            for row in batch.results:
+                rows.append(MessageToDict(row))
+        return rows
+    except Exception as e:
+        error_msg = str(e)
+        # On auth failure, clear cached client and retry once
+        global _google_ads_client
+        if "UNAUTHENTICATED" in error_msg or "authentication" in error_msg.lower():
+            _google_ads_client = None
+            # Clear cached OAuth token
+            if os.path.exists(TOKEN_CACHE):
+                try:
+                    with open(TOKEN_CACHE) as f:
+                        cache = json.load(f)
+                    cache.pop("google_access_token", None)
+                    cache.pop("google_expires_at", None)
+                    with open(TOKEN_CACHE, "w") as f:
+                        json.dump(cache, f)
+                except Exception:
+                    pass
             try:
-                with open(TOKEN_CACHE) as f:
-                    cache = json.load(f)
-                cache.pop("google_access_token", None)
-                cache.pop("google_expires_at", None)
-                with open(TOKEN_CACHE, "w") as f:
-                    json.dump(cache, f)
-            except Exception:
-                pass
-        token = google_get_token(config)
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
-            result, status = http_request("POST", url, data=data, headers=headers)
-
-    if not result:
+                client = _get_google_ads_client(config)
+                service = client.get_service("GoogleAdsService")
+                stream = service.search_stream(customer_id=customer_id, query=query)
+                rows = []
+                for batch in stream:
+                    for row in batch.results:
+                        rows.append(MessageToDict(row))
+                return rows
+            except Exception as e2:
+                print(f"Google Ads API error (retry): {e2}", file=sys.stderr)
+                return []
+        print(f"Google Ads API error: {error_msg}", file=sys.stderr)
         return []
-
-    # searchStream returns array of batches, each with "results"
-    rows = []
-    if isinstance(result, list):
-        for batch in result:
-            rows.extend(batch.get("results", []))
-    elif isinstance(result, dict):
-        if "error" in result:
-            print(f"Google Ads API error: {json.dumps(result['error'], indent=2)}", file=sys.stderr)
-            return []
-        rows.extend(result.get("results", []))
-    return rows
 
 
 def google_campaigns(config):
@@ -884,17 +900,19 @@ def print_summary(config):
 
 GBP_API_BASE = "https://mybusiness.googleapis.com/v4"
 GBP_API_V1 = "https://mybusinessbusinessinformation.googleapis.com/v1"
+GBP_ACCOUNT_MGMT = "https://mybusinessaccountmanagement.googleapis.com/v1"
+GBP_PERFORMANCE = "https://businessprofileperformance.googleapis.com/v1"
 
 def gbp_get_token(config):
     """Get Google access token (reuses Google Ads OAuth — same account)."""
     return google_get_token(config)
 
 def gbp_get_account(config):
-    """Get the GBP account ID."""
+    """Get the GBP account ID using v1 Account Management API."""
     token = gbp_get_token(config)
     if not token:
         return None
-    url = f"{GBP_API_BASE}/accounts"
+    url = f"{GBP_ACCOUNT_MGMT}/accounts"
     result, code = http_request("GET", url, headers={
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json"
@@ -902,7 +920,7 @@ def gbp_get_account(config):
     return result
 
 def gbp_get_locations(config):
-    """List all business locations."""
+    """List all business locations using v1 Business Information API."""
     token = gbp_get_token(config)
     if not token:
         return None
@@ -912,30 +930,46 @@ def gbp_get_locations(config):
         # Try to auto-discover
         accounts = gbp_get_account(config)
         if accounts and "accounts" in accounts:
-            account_id = accounts["accounts"][0].get("name", "")
+            account_name = accounts["accounts"][0].get("name", "")
+            account_id = account_name
         else:
             return None
+    # account_id should be like "accounts/12345" or just the numeric ID
+    if not account_id.startswith("accounts/"):
+        account_id = f"accounts/{account_id}"
     url = f"{GBP_API_V1}/{account_id}/locations"
     result, code = http_request("GET", url, headers={
         "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "readMask": "name,title,storefrontAddress"
     })
     return result
 
 def gbp_get_reviews(config, location_name=None):
-    """Get reviews for a location."""
+    """Get reviews for a location. Uses Account Management API for reviews."""
     token = gbp_get_token(config)
     if not token:
         return None
     gc = config.get("google_business", config.get("google_ads", {}))
     loc = location_name or gc.get("gbp_location_name", "")
     if not loc:
-        return {"error": "No GBP location configured. Set google_business.gbp_location_name in ads-config.json"}
+        # Auto-discover location
+        locations = gbp_get_locations(config)
+        if locations and "locations" in locations:
+            loc = locations["locations"][0].get("name", "")
+        if not loc:
+            return {"error": "No GBP location configured. Set google_business.gbp_location_name in ads-config.json or run 'python3 ads_api.py gbp locations' first."}
+    # Ensure location name format: accounts/XXX/locations/YYY
+    # The v4 API endpoint for reviews is still used (no v1 replacement)
     url = f"{GBP_API_BASE}/{loc}/reviews"
     result, code = http_request("GET", url, headers={
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json"
     })
+    # If v4 fails, try the Account Management reviews endpoint
+    if not result or (isinstance(result, dict) and "error" in result):
+        # Fallback: try mybusinessreviews API (currently not a separate service but part of v4)
+        pass
     return result
 
 def gbp_reply_review(config, review_name, reply_text):
@@ -952,43 +986,70 @@ def gbp_reply_review(config, review_name, reply_text):
     return result
 
 def gbp_get_insights(config, location_name=None, days=7):
-    """Get location insights (views, searches, actions)."""
+    """Get location insights (views, searches, actions) via Business Profile Performance API."""
     token = gbp_get_token(config)
     if not token:
         return None
     gc = config.get("google_business", config.get("google_ads", {}))
     loc = location_name or gc.get("gbp_location_name", "")
     if not loc:
-        return {"error": "No GBP location configured"}
-    # reportInsights endpoint
-    url = f"https://businessprofileperformance.googleapis.com/v1/{loc}:getDailyMetricsTimeSeries"
+        # Auto-discover
+        locations = gbp_get_locations(config)
+        if locations and "locations" in locations:
+            loc = locations["locations"][0].get("name", "")
+        if not loc:
+            return {"error": "No GBP location configured"}
     from datetime import datetime, timedelta
     end = datetime.utcnow()
     start = end - timedelta(days=days)
-    params = {
-        "dailyMetric": "BUSINESS_IMPRESSIONS_DESKTOP_MAPS",
-        "dailyRange.startDate.year": start.year,
-        "dailyRange.startDate.month": start.month,
-        "dailyRange.startDate.day": start.day,
-        "dailyRange.endDate.year": end.year,
-        "dailyRange.endDate.month": end.month,
-        "dailyRange.endDate.day": end.day,
-    }
-    param_str = "&".join(f"{k}={v}" for k, v in params.items())
-    result, code = http_request("GET", f"{url}?{param_str}", headers={
-        "Authorization": f"Bearer {token}",
-    })
-    return result
+
+    # Fetch multiple daily metrics and combine
+    metrics = [
+        "BUSINESS_IMPRESSIONS_DESKTOP_MAPS",
+        "BUSINESS_IMPRESSIONS_MOBILE_MAPS",
+        "BUSINESS_IMPRESSIONS_DESKTOP_SEARCH",
+        "BUSINESS_IMPRESSIONS_MOBILE_SEARCH",
+        "CALL_CLICKS",
+        "WEBSITE_CLICKS",
+        "BUSINESS_DIRECTION_REQUESTS",
+    ]
+    all_results = {}
+    for metric in metrics:
+        url = f"{GBP_PERFORMANCE}/{loc}:getDailyMetricsTimeSeries"
+        params = {
+            "dailyMetric": metric,
+            "dailyRange.startDate.year": start.year,
+            "dailyRange.startDate.month": start.month,
+            "dailyRange.startDate.day": start.day,
+            "dailyRange.endDate.year": end.year,
+            "dailyRange.endDate.month": end.month,
+            "dailyRange.endDate.day": end.day,
+        }
+        param_str = "&".join(f"{k}={v}" for k, v in params.items())
+        result, code = http_request("GET", f"{url}?{param_str}", headers={
+            "Authorization": f"Bearer {token}",
+        })
+        if result and "error" not in result:
+            all_results[metric] = result
+        elif result and "error" in result:
+            # If first metric fails, likely a scope/auth issue - return error
+            if not all_results:
+                return result
+    return all_results if all_results else {"error": "No insights data available"}
 
 def gbp_create_post(config, text, location_name=None):
-    """Create a Google Business post."""
+    """Create a Google Business post (uses v4 localPosts API - still functional)."""
     token = gbp_get_token(config)
     if not token:
         return None
     gc = config.get("google_business", config.get("google_ads", {}))
     loc = location_name or gc.get("gbp_location_name", "")
     if not loc:
-        return {"error": "No GBP location configured"}
+        locations = gbp_get_locations(config)
+        if locations and "locations" in locations:
+            loc = locations["locations"][0].get("name", "")
+        if not loc:
+            return {"error": "No GBP location configured"}
     url = f"{GBP_API_BASE}/{loc}/localPosts"
     data = {
         "languageCode": "en",
@@ -1002,14 +1063,19 @@ def gbp_create_post(config, text, location_name=None):
     return result
 
 def gbp_get_info(config, location_name=None):
-    """Get business information."""
+    """Get business information via v1 Business Information API."""
     token = gbp_get_token(config)
     if not token:
         return None
     gc = config.get("google_business", config.get("google_ads", {}))
     loc = location_name or gc.get("gbp_location_name", "")
     if not loc:
-        return {"error": "No GBP location configured"}
+        locations = gbp_get_locations(config)
+        if locations and "locations" in locations:
+            loc = locations["locations"][0].get("name", "")
+        if not loc:
+            return {"error": "No GBP location configured"}
+    # Ensure proper format: locations/XXX (for v1 API)
     url = f"{GBP_API_V1}/{loc}?readMask=title,phoneNumbers,categories,storefrontAddress,websiteUri,regularHours,profile"
     result, code = http_request("GET", url, headers={
         "Authorization": f"Bearer {token}",
@@ -2024,7 +2090,19 @@ if __name__ == "__main__":
 
         elif subcmd == "locations":
             result = gbp_get_locations(config)
-            print(json.dumps(result, indent=2) if result else "  Failed to get locations")
+            if result and "locations" in result:
+                print(json.dumps(result, indent=2))
+                # Auto-save first location name to config if not set
+                gb = config.get("google_business", {})
+                if not gb.get("gbp_location_name") and result["locations"]:
+                    loc_name = result["locations"][0].get("name", "")
+                    if loc_name:
+                        config.setdefault("google_business", {})["gbp_location_name"] = loc_name
+                        with open(CONFIG_PATH, "w") as f:
+                            json.dump(config, f, indent=2)
+                        print(f"\n  Auto-saved location name: {loc_name}")
+            else:
+                print(json.dumps(result, indent=2) if result else "  Failed to get locations")
 
         elif subcmd == "reviews":
             print_gbp_reviews(config)

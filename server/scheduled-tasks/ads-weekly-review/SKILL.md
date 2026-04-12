@@ -24,14 +24,14 @@ DATE: Run `TZ='Asia/Kolkata' date +%Y-%m-%d`
 # Extract: daily spend, clicks, CTR, CPC, conversions, calls
 ```
 
-**Pull fresh 14-day and 30-day data:**
+**Pull fresh 14-day and 30-day data for BOTH Google Ads accounts (Resort CID 2995160429 + Cafe CID 7614460903):**
 ```bash
-# Google
-python3 /root/ads/ads_api.py google campaigns
+# Google — run for BOTH accounts
+python3 /root/ads/ads_api.py google campaigns   # For each account
 python3 /root/ads/ads_api.py google metrics {CAMPAIGN_ID} 14
 python3 /root/ads/ads_api.py google search-terms {CAMPAIGN_ID} 14
 python3 /root/ads/ads_api.py google keywords {CAMPAIGN_ID}
-python3 /root/ads/ads_api.py google budget
+python3 /root/ads/ads_api.py google budget   # For each account
 python3 /root/ads/ads_api.py google recommendations
 
 # Facebook — per campaign
@@ -142,7 +142,7 @@ Write to `/root/ads/ads-weekly-review-{DATE}.md`:
 ## Week-Over-Week Metrics
 [Table from Step 2]
 
-## Google Ads — Namooru Ecostay
+## Google Ads — Namooru Ecostay (CID 2995160429)
 ### Performance
 [Weekly totals vs previous week]
 ### Search Terms Analysis
@@ -153,6 +153,10 @@ Write to `/root/ads/ads-weekly-review-{DATE}.md`:
 - P0: [status]
 - P1: [status]
 - P2: [status]
+
+## Google Ads — BUS Cafe (CID 7614460903)
+### Performance
+[Weekly totals vs previous week]
 
 ## Facebook Ads — BUS Cafe
 ### Performance by Campaign
@@ -165,7 +169,8 @@ Write to `/root/ads/ads-weekly-review-{DATE}.md`:
 [Demographics and placement analysis]
 
 ## Budget Summary
-- Google: Rs X spent this week, Rs X remaining in account
+- Google Resort: Rs X spent this week, Rs X remaining in account
+- Google Cafe: Rs X spent this week, Rs X remaining in account
 - Facebook: Rs X spent this week, Rs X/month projected
 - Combined: Rs X/week, Rs X/month projected
 

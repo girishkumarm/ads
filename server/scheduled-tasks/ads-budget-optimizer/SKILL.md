@@ -67,10 +67,10 @@ worst_new_budget = worst_current_budget * 0.80  (floor at Rs 100)
 **FOR CAFE CAMPAIGNS — FULL AUTO:**
 ```bash
 # Increase best performer's budget
-python3 /root/ads/ads_api.py fb set-budget {BEST_CAMPAIGN_ID} {NEW_BUDGET}
+python3 /root/ads/ads_api.py fb update-budget {BEST_CAMPAIGN_ID} {NEW_BUDGET}
 
 # Decrease worst performer's budget
-python3 /root/ads/ads_api.py fb set-budget {WORST_CAMPAIGN_ID} {NEW_BUDGET}
+python3 /root/ads/ads_api.py fb update-budget {WORST_CAMPAIGN_ID} {NEW_BUDGET}
 ```
 
 Log to `/root/ads/ads-changes-log.md`:
@@ -93,7 +93,7 @@ Platform: Facebook Ads (Resort)
 Type: Budget optimization
 Detail: [CAMPAIGN_NAME] has cost/call Rs X (worst among resort campaigns). Suggest reducing budget by 20% from Rs {OLD} to Rs {NEW}.
 Best resort campaign: [NAME] at Rs X/call — suggest increasing by 20%.
-Suggested action: fb set-budget {CAMPAIGN_ID} {NEW_BUDGET}
+Suggested action: fb update-budget {CAMPAIGN_ID} {NEW_BUDGET}
 Created: {DATE} {TIME}
 ```
 

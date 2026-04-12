@@ -22,13 +22,14 @@ DATE: Run `TZ='Asia/Kolkata' date +%Y-%m-%d` to get today's date.
 
 ### STEP 1: Pull Full-Day Metrics
 
-**Google Ads:**
+**Google Ads (BOTH accounts — Resort CID 2995160429 + Cafe CID 7614460903):**
 ```bash
-python3 /root/ads/ads_api.py google campaigns
-# For each ENABLED campaign:
+# Run for BOTH Google Ads accounts (read cafe_customer_id from ads-config.json)
+python3 /root/ads/ads_api.py google campaigns   # For each account
+# For each ENABLED campaign in BOTH accounts:
 python3 /root/ads/ads_api.py google metrics {CAMPAIGN_ID} 1   # Today
 python3 /root/ads/ads_api.py google metrics {CAMPAIGN_ID} 7   # 7-day avg
-python3 /root/ads/ads_api.py google budget
+python3 /root/ads/ads_api.py google budget   # For each account
 ```
 
 **Facebook Ads:**
@@ -53,7 +54,7 @@ Write to `/root/ads/ads-report-{DATE}.md`:
 ```markdown
 # Ads Report — {DATE}
 
-## Google Ads — Namooru Ecostay Resort
+## Google Ads — Namooru Ecostay Resort (CID 2995160429)
 
 | Metric | Today | Yesterday | 7-Day Avg | Trend |
 |--------|-------|-----------|-----------|-------|
@@ -66,6 +67,19 @@ Write to `/root/ads/ads-report-{DATE}.md`:
 
 Budget remaining: Rs X
 Days until fund depletion: X (at current daily burn rate)
+
+## Google Ads — BUS Cafe (CID 7614460903)
+
+| Metric | Today | Yesterday | 7-Day Avg | Trend |
+|--------|-------|-----------|-----------|-------|
+| Clicks | X | Y | Z | up/down/flat |
+| Impressions | X | Y | Z | |
+| CTR | X% | Y% | Z% | |
+| CPC | Rs X | Rs Y | Rs Z | |
+| Conversions | X | Y | Z | |
+| Spend | Rs X | Rs Y | Rs Z | |
+
+Budget remaining: Rs X
 
 ## Facebook Ads — BUS Cafe
 
@@ -84,8 +98,9 @@ Days until fund depletion: X (at current daily burn rate)
 | Avg cost/call | Rs X | Rs Y | Rs Z | |
 
 ## Combined Summary
-- Total daily spend: Rs X (Google Rs X + FB Rs X)
-- Google budget remaining: Rs X
+- Total daily spend: Rs X (Google Resort Rs X + Google Cafe Rs X + FB Rs X)
+- Google Resort budget remaining: Rs X
+- Google Cafe budget remaining: Rs X
 - FB monthly pace: Rs X/month
 
 ## Morning Audit Actions
@@ -124,10 +139,9 @@ python3 /root/stocks/notify.py send "SUMMARY" --title "Daily Ads Report" --audie
 ```
 Daily Ads Report — {DATE}
 
-GOOGLE ADS:
-  Clicks: X (trend) | CTR: X% | CPC: Rs X
-  Spend: Rs X | Conv: X
-  Budget: Rs X remaining
+GOOGLE ADS (Resort + Cafe):
+  Resort: X clicks, Rs X spend, X conv | Budget: Rs X
+  Cafe: X clicks, Rs X spend, X conv | Budget: Rs X
 
 FB ADS:
   Spend: Rs X across N campaigns
@@ -142,3 +156,23 @@ Month projected: Rs X (Google) + Rs X (FB) = Rs X
 ```
 
 Use `--priority high` if any concerning trends or budget issues, default otherwise.
+
+### STEP 6: Persist Metrics to JSON
+
+Append today's metrics to `/root/ads/ads-metrics-history.json` for trend analysis:
+```json
+{
+  "date": "{DATE}",
+  "google_resort": {
+    "spend": X, "clicks": X, "impressions": X, "ctr": X, "cpc": X, "conversions": X
+  },
+  "google_cafe": {
+    "spend": X, "clicks": X, "impressions": X, "ctr": X, "cpc": X, "conversions": X
+  },
+  "facebook": {
+    "spend": X, "clicks": X, "impressions": X, "ctr": X, "cpc": X, "calls": X, "avg_frequency": X
+  }
+}
+```
+
+Read the existing JSON array, append the new entry, and write back. If the file doesn't exist, create it as `[{entry}]`.

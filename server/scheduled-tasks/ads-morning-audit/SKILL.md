@@ -49,14 +49,20 @@ This applies to Agent 3 (Performance), Agent 4 (Fatigue), and any agent that tak
 
 #### AGENT 1 — Google Ads Health Check (RECOMMEND ONLY)
 
-**Goal:** Check overall Google Ads account health.
+**Goal:** Check overall Google Ads account health for BOTH accounts.
+
+**IMPORTANT:** There are TWO Google Ads accounts under MCC 394-768-4492:
+- **Resort:** Customer ID 2995160429 (Namooru Ecostay)
+- **Cafe:** Customer ID 7614460903 (BUS Cafe)
+
+Read `cafe_customer_id` from `/root/ads/ads-config.json` for the Cafe CID. Run all Google Ads commands for BOTH accounts.
 
 **Steps:**
-1. Run `python3 /root/ads/ads_api.py google campaigns` — get all active campaigns dynamically
-2. For each ENABLED campaign, run:
+1. Run `python3 /root/ads/ads_api.py google campaigns` for BOTH accounts — get all active campaigns dynamically
+2. For each ENABLED campaign in BOTH accounts, run:
    - `python3 /root/ads/ads_api.py google metrics {CAMPAIGN_ID} 1` (yesterday)
    - `python3 /root/ads/ads_api.py google metrics {CAMPAIGN_ID} 7` (7-day baseline)
-3. Run `python3 /root/ads/ads_api.py google budget` — check account balance
+3. Run `python3 /root/ads/ads_api.py google budget` — check account balance for both accounts
 
 **Checks:**
 - **CRITICAL: Account balance < Rs 5,000** → flag immediately (resort ran out of funds before)
@@ -87,11 +93,11 @@ BUDGET_REMAINING: Rs X
 
 #### AGENT 2 — Google Ads Search Terms Audit (RECOMMEND ONLY)
 
-**Goal:** Find wasted spend and new keyword opportunities.
+**Goal:** Find wasted spend and new keyword opportunities across BOTH Google Ads accounts (Resort CID 2995160429, Cafe CID 7614460903).
 
 **Steps:**
-1. Run `python3 /root/ads/ads_api.py google campaigns` — get active campaign IDs
-2. For each ENABLED campaign:
+1. Run `python3 /root/ads/ads_api.py google campaigns` for BOTH accounts — get active campaign IDs
+2. For each ENABLED campaign in BOTH accounts:
    - `python3 /root/ads/ads_api.py google search-terms {CAMPAIGN_ID} 7`
    - `python3 /root/ads/ads_api.py google keywords {CAMPAIGN_ID}`
    - `python3 /root/ads/ads_api.py google negatives {CAMPAIGN_ID}`
@@ -277,11 +283,11 @@ DEMOGRAPHICS_AUDIT:
 
 #### AGENT 6 — Cross-Platform Budget Tracker (NOTIFY ONLY)
 
-**Goal:** Track total ad spend, flag budget issues.
+**Goal:** Track total ad spend across BOTH Google Ads accounts + Facebook, flag budget issues.
 
 **Steps:**
-1. Run `python3 /root/ads/ads_api.py google budget`
-2. Run `python3 /root/ads/ads_api.py google campaigns` → sum yesterday's spend
+1. Run `python3 /root/ads/ads_api.py google budget` for BOTH accounts (Resort + Cafe)
+2. Run `python3 /root/ads/ads_api.py google campaigns` for BOTH accounts → sum yesterday's spend
 3. Run `python3 /root/ads/ads_api.py fb account-spend 30`
 4. Run `python3 /root/ads/ads_api.py fb campaigns` → get daily budgets
 5. Calculate:
@@ -390,11 +396,17 @@ python3 /root/stocks/notify.py send "SUMMARY_TEXT" --title "Morning Ads Audit" -
 ```
 Morning Ads Audit — {DATE}
 
-GOOGLE ADS (Namooru Resort):
+GOOGLE ADS — RESORT (CID 2995160429):
   Health: [OK/WARNING/CRITICAL]
   Yesterday: X clicks, Rs X spend, X conversions
   Budget remaining: Rs X
-  [N suggestions pending — reply "ads suggestions"]
+
+GOOGLE ADS — CAFE (CID 7614460903):
+  Health: [OK/WARNING/CRITICAL]
+  Yesterday: X clicks, Rs X spend, X conversions
+  Budget remaining: Rs X
+
+[N suggestions pending — reply "ads suggestions"]
 
 FACEBOOK ADS (BUS Cafe):
   Health: [OK/WARNING/CRITICAL]
