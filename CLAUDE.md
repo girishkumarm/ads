@@ -278,7 +278,57 @@ If Google asks for OTP → send Telegram message to Girish and wait for response
 rm -f .ads-token.json
 python3 ads_api.py auth google
 ```
-If still fails: refresh_token may be expired. Need to re-run OAuth flow.
+If still fails: refresh_token may be expired or scope-mismatched. See next section.
+
+### Refresh token expired / "insufficient authentication scopes"
+
+**Symptoms:** `invalid_grant` on auth, `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT` on GBP / GA4 / Ads calls.
+
+**Common causes:**
+- Password change on `namooruresortsads@gmail.com` revokes all refresh tokens
+- 6+ months of non-use expires the token
+- New API scope was needed (e.g. `business.manage` added) — old token still has old scopes only
+
+**Fix on the VPS — paste-ready (current refresh token, regenerated 2026-04-25 with adwords + analytics.readonly + business.manage scopes):**
+
+```bash
+cd /root/ads
+
+# 1. Update the refresh_token in ads-config.json (under "google_ads" key)
+python3 -c "
+import json
+with open('ads-config.json') as f: c = json.load(f)
+c['google_ads']['refresh_token'] = '1//0g7TpQeyzYs6hCgYIARAAGBASNwF-L9IrGCbK_2j-1ghcALZQM1wvwkPh5EJ5xFisx5rVjypxNZuY8ddXngND3Fbc-nlQEZ0lytA'
+with open('ads-config.json','w') as f: json.dump(c, f, indent=2)
+print('refresh_token updated')
+"
+
+# 2. Clear cached access token (CRITICAL — without this, bot keeps using the old expired one)
+rm -f .ads-token.json
+
+# 3. Verify all 3 scopes work
+python3 ads_api.py auth google
+python3 ads_api.py google campaigns
+python3 ads_api.py ga4 overview 7
+```
+
+**Token has these 3 scopes (verified 2026-04-25):**
+- `https://www.googleapis.com/auth/adwords` (Google Ads API)
+- `https://www.googleapis.com/auth/analytics.readonly` (GA4 Data API)
+- `https://www.googleapis.com/auth/business.manage` (Google Business Profile — quota=0 still, manage via UI/Playwright until quota approved)
+
+**OAuth client credentials (already in ads-config.json):**
+- `client_id`: `406298617381-j58p700q6d2vs2h1fnv2a1hbg1b6fshd.apps.googleusercontent.com`
+- `client_secret`: in config, do not echo
+
+**If even this token fails (rare — only if Girish revoked access):**
+1. Run `python3 oauth_capture.py` on a laptop with browser
+2. Visit this URL in same browser, sign in as `namooruresortsads@gmail.com`, click through Advanced → Continue → Allow:
+   ```
+   https://accounts.google.com/o/oauth2/v2/auth?client_id=406298617381-j58p700q6d2vs2h1fnv2a1hbg1b6fshd.apps.googleusercontent.com&redirect_uri=http://localhost:8080&response_type=code&scope=https://www.googleapis.com/auth/adwords%20https://www.googleapis.com/auth/analytics.readonly%20https://www.googleapis.com/auth/business.manage&access_type=offline&prompt=consent
+   ```
+3. Copy the new `REFRESH_TOKEN=...` printed by oauth_capture.py
+4. Update `ads-config.json` and update this CLAUDE.md section with the new token
 
 ### Facebook token expired
 FB long-lived tokens last 60 days. System warns when < 7 days remain.
