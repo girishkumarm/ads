@@ -19,6 +19,8 @@ ads-metrics-history.json
 .telegram-offset
 telegram-config.json
 media-inbox/
+.saturday_push_state.json
+.playwright-mcp/
 
 # Telegram offset files
 .telegram-offset-*
