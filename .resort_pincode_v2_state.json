@@ -1,0 +1,117 @@
+{
+  "timestamp": "2026-05-03 12:29:01.391823",
+  "actions": [
+    {
+      "action": "REMOVE-positive",
+      "pin": "560006",
+      "gid": "9062026",
+      "old_bm": 0.5,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062026"
+    },
+    {
+      "action": "EXCLUDE",
+      "pin": "560006",
+      "gid": "9062026",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062026"
+    },
+    {
+      "action": "REMOVE-positive",
+      "pin": "560110",
+      "gid": "9147676",
+      "old_bm": 0.5,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9147676"
+    },
+    {
+      "action": "EXCLUDE",
+      "pin": "560110",
+      "gid": "9147676",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9147676"
+    },
+    {
+      "action": "REMOVE-positive",
+      "pin": "560057",
+      "gid": "9062057",
+      "old_bm": 0.5,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062057"
+    },
+    {
+      "action": "EXCLUDE",
+      "pin": "560057",
+      "gid": "9062057",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062057"
+    },
+    {
+      "action": "UPDATE-bm",
+      "pin": "560004",
+      "gid": "9062013",
+      "old_bm": 0.7,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062013"
+    },
+    {
+      "action": "ADD-positive",
+      "pin": "560068",
+      "gid": "9062009",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062009"
+    },
+    {
+      "action": "ADD-positive",
+      "pin": "560091",
+      "gid": "9062055",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062055"
+    },
+    {
+      "action": "ADD-positive",
+      "pin": "560043",
+      "gid": "9062038",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062038"
+    },
+    {
+      "action": "ADD-positive",
+      "pin": "560103",
+      "gid": "9061998",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9061998"
+    },
+    {
+      "action": "ADD-positive",
+      "pin": "560008",
+      "gid": "9062031",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062031"
+    },
+    {
+      "action": "ADD-positive",
+      "pin": "560022",
+      "gid": "9062062",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062062"
+    },
+    {
+      "action": "ADD-positive",
+      "pin": "560007",
+      "gid": "9062004",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062004"
+    },
+    {
+      "action": "ADD-positive",
+      "pin": "560061",
+      "gid": "9062078",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9062078"
+    },
+    {
+      "action": "ADD-positive",
+      "pin": "560048",
+      "gid": "9061993",
+      "old_bm": null,
+      "new_rn": "customers/2995160429/campaignCriteria/21740834372~9061993"
+    }
+  ]
+}
