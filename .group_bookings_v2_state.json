@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-05-03 14:29:50.132404",
+  "actions": [
+    {
+      "action": "pause_old_ag",
+      "ag_id": "196256288356"
+    },
+    {
+      "action": "create_budget",
+      "rn": "customers/2995160429/campaignBudgets/15547479323",
+      "amount": 500
+    },
+    {
+      "action": "create_campaign",
+      "rn": "customers/2995160429/campaigns/23818461520",
+      "id": "23818461520"
+    },
+    {
+      "action": "create_ag",
+      "rn": "customers/2995160429/adGroups/195483588385",
+      "id": "195483588385"
+    },
+    {
+      "action": "create_rsa",
+      "ad_id": "807546992295"
+    }
+  ]
+}
