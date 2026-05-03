@@ -1,0 +1,108 @@
+{
+  "timestamp": "2026-05-03 12:42:06.196441",
+  "jayanagar": [
+    {
+      "action": "re_enable",
+      "kw": "brewing untold stories",
+      "match": "PHRASE",
+      "old_status": "PAUSED"
+    },
+    {
+      "action": "re_enable",
+      "kw": "cafe in Jayanagar",
+      "match": "PHRASE",
+      "old_status": "PAUSED"
+    },
+    {
+      "action": "re_enable",
+      "kw": "aesthetic cafe Bangalore",
+      "match": "PHRASE",
+      "old_status": "PAUSED"
+    },
+    {
+      "action": "re_enable",
+      "kw": "jayanagar cafes",
+      "match": "PHRASE",
+      "old_status": "PAUSED"
+    },
+    {
+      "action": "re_enable",
+      "kw": "best cafe Jayanagar",
+      "match": "PHRASE",
+      "old_status": "PAUSED"
+    },
+    {
+      "action": "re_enable",
+      "kw": "cafes near Jayanagar metro",
+      "match": "PHRASE",
+      "old_status": "PAUSED"
+    },
+    {
+      "action": "re_enable",
+      "kw": "cafes Jayanagar 4th block",
+      "match": "PHRASE",
+      "old_status": "PAUSED"
+    },
+    {
+      "action": "re_enable",
+      "kw": "date cafe Bangalore",
+      "match": "PHRASE",
+      "old_status": "PAUSED"
+    },
+    {
+      "action": "re_enable",
+      "kw": "coffee shop Jayanagar",
+      "match": "PHRASE",
+      "old_status": "PAUSED"
+    },
+    {
+      "action": "device",
+      "device": "DESKTOP",
+      "new": 0.5
+    }
+  ],
+  "btm": [
+    {
+      "action": "EXCLUDE",
+      "pin": "560037"
+    },
+    {
+      "action": "EXCLUDE",
+      "pin": "560066"
+    },
+    {
+      "action": "EXCLUDE",
+      "pin": "560064"
+    },
+    {
+      "action": "EXCLUDE",
+      "pin": "560058"
+    },
+    {
+      "action": "EXCLUDE",
+      "pin": "560099"
+    },
+    {
+      "action": "EXCLUDE",
+      "pin": "560043"
+    },
+    {
+      "action": "EXCLUDE",
+      "pin": "560100"
+    },
+    {
+      "action": "EXCLUDE",
+      "pin": "560097"
+    },
+    {
+      "action": "pause_kw",
+      "kw": "cafe in btm layout",
+      "match": "PHRASE"
+    },
+    {
+      "action": "device",
+      "device": "DESKTOP",
+      "new": 0.1
+    }
+  ]
+}
