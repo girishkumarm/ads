@@ -289,7 +289,7 @@ If still fails: refresh_token may be expired or scope-mismatched. See next secti
 - 6+ months of non-use expires the token
 - New API scope was needed (e.g. `business.manage` added) — old token still has old scopes only
 
-**Fix on the VPS — paste-ready (current refresh token, regenerated 2026-04-27 with adwords + analytics.readonly + business.manage scopes):**
+**Fix on the VPS — paste-ready (current refresh token, regenerated 2026-05-09 with adwords + analytics.readonly + business.manage scopes):**
 
 ```bash
 cd /root/ads
@@ -298,7 +298,7 @@ cd /root/ads
 python3 -c "
 import json
 with open('ads-config.json') as f: c = json.load(f)
-c['google_ads']['refresh_token'] = '1//0g198_lveme_aCgYIARAAGBASNwF-L9IrEkXAufC2b0MbilW2zrNxMCs1HQ6D6kfE9jg76aww0jG9CiZ44uFjd_M41jQtRQC1OWs'
+c['google_ads']['refresh_token'] = '1//0gsP1-Px5JJKkCgYIARAAGBASNwF-L9Ir5G-jTtcLPuJ_WdIvVGPdbMMemqyYMXBGrD0PWeMsuxfaVJhIDLF1Zxz6MDteyFRdV0I'
 with open('ads-config.json','w') as f: json.dump(c, f, indent=2)
 print('refresh_token updated')
 "
@@ -312,7 +312,7 @@ python3 ads_api.py google campaigns
 python3 ads_api.py ga4 overview 7
 ```
 
-**Token has these 3 scopes (verified 2026-04-27):**
+**Token has these 3 scopes (verified 2026-05-09):**
 - `https://www.googleapis.com/auth/adwords` (Google Ads API)
 - `https://www.googleapis.com/auth/analytics.readonly` (GA4 Data API)
 - `https://www.googleapis.com/auth/business.manage` (Google Business Profile — quota=0 still, manage via UI/Playwright until quota approved)
